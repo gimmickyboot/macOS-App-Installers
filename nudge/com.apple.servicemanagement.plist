@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Rules</key>
+	<array>
+		<dict>
+			<key>Comment</key>
+			<string>Nudge</string>
+			<key>RuleType</key>
+			<string>Label</string>
+			<key>RuleValue</key>
+			<string>com.github.macadmins.Nudge.Logger</string>
+		</dict>
+		<dict>
+			<key>Comment</key>
+			<string>Nudge</string>
+			<key>RuleType</key>
+			<string>Label</string>
+			<key>RuleValue</key>
+			<string>com.github.macadmins.Nudge</string>
+		</dict>
+	</array>
+</dict>
+</plist>

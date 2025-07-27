@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# no MAU
+
+appInstallPath="/Applications"
+bundleName="Microsoft PowerPoint"
+installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
+
+downloadURL=$(/usr/bin/curl -s "https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSRD10.xml" | /usr/bin/grep pkg | /usr/bin/head -n 1 | /usr/bin/sed -e 's/<[^>]*>//g' | xargs)
+currentVers=$(/bin/echo "${downloadURL}" | /usr/bin/grep -oE '[0-9]+(\.[0-9]+)+')
+FILE=${downloadURL##*/}
+
+# compare version numbers
+if [ "${installedVers}" ]; then
+  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+
+  # pad out currentVersNoDots to match installedVersNoDots
+  installedVersNoDotsCount=${#installedVersNoDots}
+  currentVersNoDotsCount=${#currentVersNoDots}
+
+  while [ "${currentVersNoDotsCount}" -lt "${installedVersNoDotsCount}" ]; do
+    currentVersNoDots="${currentVersNoDots}0"
+    currentVersNoDotsCount=$((currentVersNoDotsCount + 1))
+  done
+
+  if [ "${installedVersNoDots}" -ge "${currentVersNoDots}" ]; then
+    /bin/echo "${bundleName} does not need to be updated"
+    exit 0
+  else
+    /bin/echo "${bundleName} needs to be updated"
+  fi
+else
+  /bin/echo "Installing ${bundleName}"
+fi
+
+if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
+  /usr/sbin/installer -pkg /tmp/"${FILE}" -target /
+  /bin/rm /tmp/"${FILE}"
+fi
