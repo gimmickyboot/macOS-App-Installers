@@ -5,7 +5,7 @@ bundleName="Citrix Workspace"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CitrixVersionString 2>/dev/null)
 
 URL="https://www.citrix.com/downloads/workspace-app/mac/workspace-app-for-mac-latest.html"
-currentVers=$(/usr/bin/curl -s "${URL}" -H sec-ch-ua-platform: "macOS" -H user-agent:" Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" | /usr/bin/xmllint --html --xpath 'string(//p[contains(., "Version")])' 2> /dev/null - | /usr/bin/cut -d " " -f3 - | /usr/bin/awk -F "(" '{print $1}')
+currentVers=$(/usr/bin/curl -s "${URL}" -H sec-ch-ua-platform: "macOS" -H user-agent:" Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" | /usr/bin/xmllint --html --xpath 'string(//p[contains(., "Version")])' 2> /dev/null - | /usr/bin/awk '{print $2}')
 tempDownloadURL=$(/usr/bin/curl -s "${URL}#ctx-dl-eula-external" -H sec-ch-ua-platform: "macOS" -H user-agent:" Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" | /usr/bin/xmllint --html --xpath "string(//a[contains(@rel, 'downloads.citrix.com')]/@rel)" 2> /dev/null -)
 downloadURL="http:${tempDownloadURL}"
 FILE="CitrixWorkspaceApp.dmg"
