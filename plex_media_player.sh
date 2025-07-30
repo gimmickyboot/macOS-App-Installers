@@ -16,8 +16,8 @@ FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed -e 's/\.//g' -e 's/-//g' -e 's/[a-zA-Z]//g')
+  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed -e 's/\.//g' -e 's/-//g' -e 's/[a-zA-Z]//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}
