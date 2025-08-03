@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NotificationSettings</key>
+	<array>
+		<dict>
+			<key>AlertType</key>
+			<integer>1</integer>
+			<key>BadgesEnabled</key>
+			<true/>
+			<key>BundleIdentifier</key>
+			<string>com.google.Chrome</string>
+			<key>CriticalAlertEnabled</key>
+			<true/>
+			<key>GroupingType</key>
+			<integer>0</integer>
+			<key>NotificationsEnabled</key>
+			<true/>
+			<key>PreviewType</key>
+			<integer>1</integer>
+			<key>ShowInCarPlay</key>
+			<true/>
+			<key>ShowInLockScreen</key>
+			<true/>
+			<key>ShowInNotificationCenter</key>
+			<true/>
+			<key>SoundsEnabled</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>AlertType</key>
+			<integer>1</integer>
+			<key>BadgesEnabled</key>
+			<true/>
+			<key>BundleIdentifier</key>
+			<string>com.google.Chrome.framework.AlertNotificationService</string>
+			<key>CriticalAlertEnabled</key>
+			<true/>
+			<key>GroupingType</key>
+			<integer>0</integer>
+			<key>NotificationsEnabled</key>
+			<true/>
+			<key>PreviewType</key>
+			<integer>1</integer>
+			<key>ShowInCarPlay</key>
+			<true/>
+			<key>ShowInLockScreen</key>
+			<true/>
+			<key>ShowInNotificationCenter</key>
+			<true/>
+			<key>SoundsEnabled</key>
+			<true/>
+		</dict>
+	</array>
+</dict>
+</plist>

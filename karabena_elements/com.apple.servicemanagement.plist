@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Rules</key>
+	<array>
+		<dict>
+			<key>Comment</key>
+			<string>Karabena-Elements</string>
+			<key>RuleType</key>
+			<string>TeamIdentifier</string>
+			<key>RuleValue</key>
+			<string>G43BCU2T37</string>
+		</dict>
+	</array>
+</dict>
+</plist>
