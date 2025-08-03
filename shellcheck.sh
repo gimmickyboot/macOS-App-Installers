@@ -50,13 +50,13 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  /bin/rm "${appInstallPath}"/"${bundleName} 2>/dev/null
+  /bin/rm "${appInstallPath}"/"${bundleName}" 2>/dev/null
   /usr/bin/tar -xvf /tmp/"${FILE}" -C /tmp/
   if [ ! -d "${appInstallPath}" ]; then
     /bin/mkdir -p "${appInstallPath}"
   fi
-  /bin/mv /tmp/shellcheck-v"${currentVers}"/"${bundleName}"
-  /usr/bin/xattr -d com.apple.quarantine "${appInstallPath}"/"${bundleName}
-  /bin/chmod a+x "${appInstallPath}"/"${bundleName}
+  /bin/mv /tmp/shellcheck-v"${currentVers}"/"${bundleName}" "${appInstallPath}"/"${bundleName}"
+  /usr/bin/xattr -d com.apple.quarantine "${appInstallPath}"/"${bundleName}"
+  /bin/chmod a+x "${appInstallPath}"/"${bundleName}"
   /bin/rm /tmp/"${FILE}"
 fi
