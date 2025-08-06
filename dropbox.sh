@@ -9,11 +9,15 @@ case $(uname -m) in
     downloadURL="https://www.dropbox.com/download?plat=mac&full=1&arch=arm64"
     ;;
 
-  *)
+  x86_64)
     downloadURL="https://www.dropbox.com/download?plat=mac&full=1"
     ;;
 
+  *)
+    /bin/echo "Unknown processor type. Exiting"
+    exit 1
 esac
+
 FILE=${downloadURL##*/}
 currentVers=$(curl -sI "${downloadURL}" | /usr/bin/grep -i ^Location | /usr/bin/awk '{print $2}' | /usr/bin/sed -E 's/.*%20([0-9.]*)/\1/g' | rev | /usr/bin/cut -d . -f 3- - | rev)
 
