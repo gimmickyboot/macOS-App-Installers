@@ -10,7 +10,7 @@
 			<key>BadgesEnabled</key>
 			<true/>
 			<key>BundleIdentifier</key>
-			<string>com.openai.chat</string>
+			<string>com.runningwithcrayons.Alfred</string>
 			<key>CriticalAlertEnabled</key>
 			<true/>
 			<key>GroupingType</key>
