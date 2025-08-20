@@ -1,13 +1,11 @@
 #!/bin/sh
 
-# no MAU
-
 appInstallPath="/Applications"
-bundleName="Windows App"
+bundleName="FSMonitor"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-downloadURL=$(/usr/bin/curl -s "https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSRD10.xml" | /usr/bin/grep pkg | /usr/bin/head -n 1 | /usr/bin/sed -e 's/<[^>]*>//g' | xargs)
-currentVers=$(/bin/echo "${downloadURL}" | /usr/bin/grep -oE '[0-9]+(\.[0-9]+)+')
+downloadURL=$(/usr/bin/curl -s "https://fsmonitor.com" | /usr/bin/grep zip | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath '//a/@href' - | /usr/bin/cut -d \" -f 2 -)
+currentVers=$(/bin/echo "${downloadURL}" | /usr/bin/grep -oE 'FSMonitor_[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/FSMonitor_//')
 FILE=${downloadURL##*/}
 
 # compare version numbers
@@ -35,6 +33,10 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  /usr/sbin/installer -pkg /tmp/"${FILE}" -target /
+  /bin/rm -rf ${appInstallPath}/"${bundleName}.app" >/dev/null 2>&1
+  /usr/bin/ditto -xk /tmp/"${FILE}" "${appInstallPath}"/.
+  /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
+  /usr/sbin/chown -R root:admin "${appInstallPath}"/"${bundleName}.app"
+  /bin/chmod -R 755 "${appInstallPath}"/"${bundleName}.app"
   /bin/rm /tmp/"${FILE}"
 fi
