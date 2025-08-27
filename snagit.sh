@@ -4,7 +4,7 @@ appInstallPath="/Applications"
 bundleName="Snagit"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-currentVers=$(/usr/bin/curl -s "https://support.techsmith.com/hc/en-us/articles/115006443147-Snagit-Mac-Version-History" | /usr/bin/xmllint --html --xpath '//*/head/meta[2]/@content' - 2>/dev/null | /usr/bin/cut -d \" -f 2- - | /usr/bin/grep -oE 'Snagit[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+' | /usr/bin/awk '{print $2}')
+currentVers=$(/usr/bin/curl -s "https://support.techsmith.com/hc/en-us/articles/37938520706957-Snagit-2025-Version-History" | /usr/bin/xmllint --html --xpath '//*/head/meta[2]/@content' - 2>/dev/null | /usr/bin/cut -d \" -f 2- - | /usr/bin/grep -oE 'in[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+' | /usr/bin/awk '{print $2}')
 versionYear=$(printf '%s' "${currentVers}" | /usr/bin/cut -c 1-4 -)
 downloadURL=$(/usr/bin/curl -s "https://sparkle.cloud.techsmith.com/api/v1/AppcastManifest/?version=${currentVers}&utm_source=product&utm_medium=snagit&utm_campaign=sm${versionYear}&ipc_item_name=snagit&ipc_platform=macos" | /usr/bin/xmllint --xpath '//rss/channel/item/enclosure/@url' - | /usr/bin/cut -d \" -f 2 -)
 FILE=${downloadURL##*/}
