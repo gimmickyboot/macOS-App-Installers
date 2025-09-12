@@ -8,7 +8,7 @@ gitHubURL="https://github.com/SAP/macOS-enterprise-privileges"
 latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
 latestReleaseTag=$(basename "${latestReleaseURL}")
 currentVers=$(/bin/echo "${latestReleaseTag}")
-downloadURL="${gitHubURL}/releases/download/${latestReleaseTag}/Privileges_${currentVers}.pkg"
+downloadURL="${gitHubURL}/releases/download/${latestReleaseTag}/SAPCorp_Privileges_${currentVers}.pkg"
 FILE=${downloadURL##*/}
 
 # compare version numbers
