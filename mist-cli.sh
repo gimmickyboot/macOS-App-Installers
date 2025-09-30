@@ -1,11 +1,15 @@
 #!/bin/sh
 
-appInstallPath="/Applications"
-bundleName="VoodooPad"
-installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
+appInstallPath="/usr/local/bin"
+bundleName="mist"
+# installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
+installedVers=$("${appInstallPath}/${bundleName}" --version | /usr/bin/awk '{print $1}')
 
-currentVers=$(/usr/bin/curl -s "https://www.voodoopad.com/" -A 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.2 Safari/605.1.15' | /usr/bin/grep Version | /usr/bin/xmllint --xpath '//p/text()' - | /usr/bin/awk '{print $2}')
-downloadURL="https://voodoopad.s3.amazonaws.com/VoodooPad-${currentVers}.zip"
+gitHubURL="https://github.com/ninxsoft/mist-cli"
+latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
+latestReleaseTag=$(basename "${latestReleaseURL}")
+currentVers=$(/bin/echo "${latestReleaseTag}" | /usr/bin/sed 's/v//')
+downloadURL="${gitHubURL}/releases/download/${latestReleaseTag}/mist-cli.${currentVers}.pkg"
 FILE=${downloadURL##*/}
 
 # compare version numbers
@@ -33,10 +37,6 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  /bin/rm -rf ${appInstallPath}/"${bundleName}.app" >/dev/null 2>&1
-  /usr/bin/ditto -xk /tmp/"${FILE}" "${appInstallPath}"/.
-  /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
-  /usr/sbin/chown -R root:admin "${appInstallPath}"/"${bundleName}.app"
-  /bin/chmod -R 755 "${appInstallPath}"/"${bundleName}.app"
+  /usr/sbin/installer -pkg /tmp/"${FILE}" -target /
   /bin/rm /tmp/"${FILE}"
 fi

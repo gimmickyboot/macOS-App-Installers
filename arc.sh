@@ -1,11 +1,12 @@
 #!/bin/sh
 
 appInstallPath="/Applications"
-bundleName="VoodooPad"
-installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
+bundleName="Arc"
+installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleVersion 2>/dev/null)
 
-currentVers=$(/usr/bin/curl -s "https://www.voodoopad.com/" -A 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.2 Safari/605.1.15' | /usr/bin/grep Version | /usr/bin/xmllint --xpath '//p/text()' - | /usr/bin/awk '{print $2}')
-downloadURL="https://voodoopad.s3.amazonaws.com/VoodooPad-${currentVers}.zip"
+XML=$(/usr/bin/curl -s "https://releases.arc.net/updates.xml")
+currentVers=$(/bin/echo "${XML}" | /usr/bin/xmllint --xpath '//rss/channel/item[1]/*[name()="sparkle:shortVersionString"]/text()' - | /usr/bin/awk '{print $1}')
+downloadURL=$(/bin/echo "${XML}" | /usr/bin/xmllint --xpath '//rss/channel/item[1]/enclosure/@url' - | /usr/bin/cut -d \" -f 2 -)
 FILE=${downloadURL##*/}
 
 # compare version numbers
@@ -33,7 +34,7 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  /bin/rm -rf ${appInstallPath}/"${bundleName}.app" >/dev/null 2>&1
+  /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
   /usr/bin/ditto -xk /tmp/"${FILE}" "${appInstallPath}"/.
   /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
   /usr/sbin/chown -R root:admin "${appInstallPath}"/"${bundleName}.app"

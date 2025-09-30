@@ -6,7 +6,7 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 
 latestReleaseURL=$(/usr/bin/curl -sI "https://github.com/praat/praat.github.io/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
 latestReleaseTag=$(/bin/echo "${latestReleaseURL}" | rev | /usr/bin/awk -F "/" '{print $1}' | rev)
-currentVers=$(/bin/echo "${latestReleaseTag}" | sed 's/^v//')
+currentVers=$(/bin/echo "${latestReleaseTag}" | sed 's/[a-z]//g')
 currentVersNoDots=$(/bin/echo "${currentVers}" | sed 's/\.//g')
 downloadURL="https://github.com/praat/praat.github.io/releases/download/${latestReleaseTag}/praat${currentVersNoDots}_mac.dmg"
 FILE=${downloadURL##*/}
