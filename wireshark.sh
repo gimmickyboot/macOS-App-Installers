@@ -5,22 +5,8 @@ bundleName="Wireshark"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 xmlData=$(/usr/bin/curl -s "https://www.wireshark.org/update/0/Wireshark/3.6.3/macOS/x86-64/en-US/stable.xml")
-currentVers=$(/bin/echo "${xmlData}"| /usr/bin/xmllint --xpath "(//rss/channel/item)[1]/title/text()" - | /usr/bin/awk '{print $2}')
-case $(uname -m) in
-  arm64)
-    archType="Arm"
-    ;;
-
-  x86_64)
-    archType="Intel"
-    ;;
-
-  *)
-    /bin/echo "Unknown processor architecture. Exiting"
-    exit 1
-    ;;
-esac
-downloadURL="https://2.na.dl.wireshark.org/osx/Wireshark%20${currentVers}%20${archType}%2064.dmg"
+currentVers=$(/bin/echo "${xmlData}"| /usr/bin/xmllint --xpath '//rss/channel/item[1]/title/text()' - | /usr/bin/awk '{print $2}')
+downloadURL=$(/bin/echo "${xmlData}" | /usr/bin/xmllint --xpath 'string(//rss/channel/item[1]/enclosure/@url)' -)
 FILE=${downloadURL##*/}
 
 # compare version numbers

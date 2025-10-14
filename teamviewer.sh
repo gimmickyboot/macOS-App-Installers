@@ -4,7 +4,7 @@ appInstallPath="/Applications"
 bundleName="TeamViewer"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-downloadURL=$(/usr/bin/curl -s "https://download.teamviewer.com/download/update/macupdates.xml?version=15.1.1&os=macos&osversion=$(/usr/bin/sw_vers -productVersion)" | /usr/bin/xmllint --xpath '//rss/channel/item/enclosure/@url' - | /usr/bin/grep -v Host | /usr/bin/cut -d \" -f 2 -)
+downloadURL=$(/usr/bin/curl -s "https://download.teamviewer.com/download/update/macupdates.xml?version=15.1.1&os=macos&osversion=$(/usr/bin/sw_vers -productVersion)" | /usr/bin/xmllint --xpath '//rss/channel/item/enclosure/@url' - | /usr/bin/grep -v Host | /usr/bin/cut -d \" -f 2 - | /usr/bin/head -n 1)
 currentVers=$(/bin/echo "${downloadURL}" | /usr/bin/grep -v Host | /usr/bin/cut -d \" -f 2 - | /usr/bin/rev | /usr/bin/cut -d "/" -f 2 - | /usr/bin/rev)
 FILE=${downloadURL##*/}
 
