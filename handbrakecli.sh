@@ -10,7 +10,7 @@ latestReleaseTag=$(basename "${latestReleaseURL}")
 currentVers=$(/bin/echo "${latestReleaseTag}" | /usr/bin/tr -d '[:alpha:]' | /usr/bin/sed 's/-//')
 downloadURL="${gitHubURL}/releases/download/${latestReleaseTag}/HandBrakeCLI-${currentVers}.dmg"
 FILE=${downloadURL##*/}
-SHAHash=$(/usr/bin/curl -s "${gitHubURL}/wiki/Checksums" | /usr/bin/grep -A 2 HandBrakeCLI-"${currentVers}".dmg | /usr/bin/tail -n 1 | /usr/bin/sed -e 's/<td>//g' -e 's/<\/td>//g')
+SHAHash=$(/usr/bin/curl -sL "$(/bin/echo "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/awk "f&&/sha256:/{print; exit} /${FILE}/{f=1}"| /usr/bin/sed -E 's/.*sha256:([0-9a-fA-F]{64}).*/\1/')
 
 # compare version numbers
 if [ "${installedVers}" ]; then

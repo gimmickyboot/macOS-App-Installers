@@ -10,7 +10,7 @@ latestReleaseTag=$(basename "${latestReleaseURL}")
 currentVers=$(/bin/echo "${latestReleaseTag}" | /usr/bin/tr -d '[:alpha:]' | /usr/bin/sed 's/-//')
 downloadURL="${gitHubURL}/releases/download/${latestReleaseTag}/audacity-macOS-${currentVers}-universal.dmg"
 FILE=${downloadURL##*/}
-audacitySHAHash=$(/usr/bin/curl -sL "https://github.com/audacity/audacity/releases/download/Audacity-${currentVers}/CHECKSUMS.txt" | /usr/bin/grep "${FILE}" | /usr/bin/awk '{print $3}' | /usr/bin/sed 's/\r//g')
+audacitySHAHash=$(/usr/bin/curl -sL "$(/bin/echo "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/awk "f&&/sha256:/{print; exit} /${FILE}/{f=1}"| /usr/bin/sed -E 's/.*sha256:([0-9a-fA-F]{64}).*/\1/')
 
 lameURL="https://lame.buanzo.org"
 userAgent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"

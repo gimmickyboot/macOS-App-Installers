@@ -4,12 +4,14 @@ appInstallPath="/Applications"
 bundleName="Praat"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-latestReleaseURL=$(/usr/bin/curl -sI "https://github.com/praat/praat.github.io/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
-latestReleaseTag=$(/bin/echo "${latestReleaseURL}" | rev | /usr/bin/awk -F "/" '{print $1}' | rev)
-currentVers=$(/bin/echo "${latestReleaseTag}" | sed 's/[a-z]//g')
+gitHubURL="https://github.com/praat/praat.github.io"
+latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
+latestReleaseTag=$(basename "${latestReleaseURL}")
+currentVers=$(/bin/echo "${latestReleaseTag}" | /usr/bin/tr -d '[:alpha:]' | /usr/bin/sed 's/-//')
 currentVersNoDots=$(/bin/echo "${currentVers}" | sed 's/\.//g')
-downloadURL="https://github.com/praat/praat.github.io/releases/download/${latestReleaseTag}/praat${currentVersNoDots}_mac.dmg"
+downloadURL="${gitHubURL}/releases/download/${latestReleaseTag}/praat${currentVersNoDots}_mac.dmg"
 FILE=${downloadURL##*/}
+SHAHash=$(/usr/bin/curl -sL "$(/bin/echo "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/awk "f&&/sha256:/{print; exit} /${FILE}/{f=1}"| /usr/bin/sed -E 's/.*sha256:([0-9a-fA-F]{64}).*/\1/')
 
 # compare version numbers
 if [ "${installedVers}" ]; then
@@ -36,6 +38,22 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
+  SHAResult=$(/bin/echo "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  case "${SHAResult}" in
+    *OK)
+      /bin/echo "SHA hash has successfully verifed."
+      ;;
+
+    *FAILED)
+      /bin/echo "SHA hash has failed verification"
+      exit 1
+      ;;
+
+    *)
+      /bin/echo "An unknown error has occured."
+      exit 1
+      ;;
+  esac
   TMPDIR=$(mktemp -d)
   /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
   /usr/bin/ditto "${TMPDIR}"/"${bundleName}.app" "${appInstallPath}"/"${bundleName}.app"
