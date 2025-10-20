@@ -45,19 +45,11 @@ if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL
 fi
 
 if [ ! "${installedVers}" ]; then
-  CurrentlyLoggedInUser=$(stat -f %Su /dev/console)
-  currentUserShell=$(/usr/bin/dscl . -read /Users/"${CurrentlyLoggedInUser}" UserShell | /usr/bin/awk '{print $2}')
-  case "${currentUserShell}" in
-    *zsh*)
-      printf '\n%s\n' "alias apiutil=\"/Applications/API\ Utility.app/Contents/MacOS/apiutil\"" >> "${CurrentlyLoggedInUser}"/.zshrc
-      ;;
+  cat << 'EOF' > /usr/local/bin/apiutil
+#!/bin/sh
+"/Applications/API Utility.app/Contents/MacOS/apiutil" "$@"
+EOF
 
-    *bash*)
-      printf '\n%s\n' "alias apiutil=\"/Applications/API\ Utility.app/Contents/MacOS/apiutil\"" >> "${CurrentlyLoggedInUser}"/.bash_profile
-      ;;
-
-    *)
-      /bin/echo "Unknown shell."
-      ;;
-  esac
+  /usr/sbin/chown root:wheel /usr/local/bin/apiutil
+  /bin/chmod a+x /usr/local/bin/apiutil
 fi
