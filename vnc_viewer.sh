@@ -3,9 +3,12 @@
 appInstallPath="/Applications"
 bundleName="VNC Viewer"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
+jqBin=$(whereis -qb /usr/bin/jq)
 
-downloadURL=$(/usr/bin/curl -Ls "https://www.realvnc.com/en/connect/download/viewer" -H user-agent:" Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" | /usr/bin/xmllint --html --xpath 'string(//*[@id="os-server-viewer-section"]/div/div/div/section/div/div[1]/div/div[2]/div/div[2]/div[2]/div/a/@href)' - 2>/dev/null)
-currentVers=$(/bin/echo "${downloadURL}" | /usr/bin/grep -oE 'VNC-Viewer-[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/VNC-Viewer-//')
+jSON=$(/usr/bin/curl -Ls "https://www.realvnc.com/en/connect/download/viewer" -H user-agent:" Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" | /usr/bin/tr '>' '\n' | /usr/bin/grep dmg | /usr/bin/tail -n 1 | /usr/bin/sed 's/<\/script//')
+currentVers=$(printf '%s\n' "${jSON}" | "${jqBin}" -r '.index.connect.products.viewer.platforms.macos.versions | to_entries | .[0].value.number')
+downloadURL="https://downloads.realvnc.com/download/file/viewer.files/$(printf '%s\n' "${jSON}" | "${jqBin}" -r '.index.connect.products.viewer.platforms.macos.versions | to_entries | .[0].value.files[].file')"
+SHAHash=$(printf '%s\n' "${jSON}" | "${jqBin}" -r '.index.connect.products.viewer.platforms.macos.versions | to_entries | .[0].value.files[].sha256')
 FILE=${downloadURL##*/}
 
 # compare version numbers
@@ -33,6 +36,22 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
+  SHAResult=$(/bin/echo "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  case "${SHAResult}" in
+    *OK)
+      /bin/echo "SHA hash has successfully verifed."
+      ;;
+
+    *FAILED)
+      /bin/echo "SHA hash has failed verification"
+      exit 1
+      ;;
+
+    *)
+      /bin/echo "An unknown error has occured."
+      exit 1
+      ;;
+  esac
   /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
   TMPDIR=$(mktemp -d)
   /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
