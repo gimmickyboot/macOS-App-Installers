@@ -6,7 +6,7 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 
 URL="http://www.sassafras.com/client-download/"
 currentVers=$(/usr/bin/curl -sL "${URL}" | /usr/bin/xmllint --format --html - 2>/dev/null | /usr/bin/grep "KeyAccess.*for Mac" | /usr/bin/awk '{print $2}')
-downloadURL=$(/usr/bin/curl -sL "${URL}" | /usr/bin/tr '>' '\n' | /usr/bin/grep "https.*ksp-client.*pkg" | /usr/bin/cut -d '"' -f 2)
+downloadURL=$(/usr/bin/curl -sL "${URL}" | /usr/bin/tr '>' '\n' | /usr/bin/grep "https.*ksp-client.*pkg" | /usr/bin/cut -d '"' -f 2 | /usr/bin/head -n 1)
 FILE=${downloadURL##*/}
 
 # compare version numbers
