@@ -1,11 +1,11 @@
 #!/bin/sh
 
-appInstallPath="/Applications"
-bundleName="MP4Splitter"
-installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
+appInstallPath="/Library/Application Support/GPGTools"
+bundleName="GPG Tools"
+installedVers=$(/usr/bin/defaults read "${appInstallPath}"/version.plist CFBundleShortVersionString 2>/dev/null)
 
-currentVers=$(/usr/bin/curl -s "https://www.mp4joiner.org/en/" | /usr/bin/tr '>' '\n' | /usr/bin/grep dmg | /usr/bin/grep -oE 'MP4Tools-[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/MP4Tools-//')
-downloadURL="https://ixpeering.dl.sourceforge.net/project/mp4joiner/MP4Tools/${currentVers}/MP4Tools-${currentVers}-MacOSX.dmg"
+downloadURL=$(/usr/bin/curl -Ls "https://gpgtools.org" | /usr/bin/grep dmg | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - 2>/dev/null)
+currentVers=$(/bin/echo ${downloadURL}| /usr/bin/cut -d "/" -f 4- - | /usr/bin/grep -oE 'GPG_Suite-[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/GPG_Suite-//')
 FILE=${downloadURL##*/}
 
 # compare version numbers
@@ -34,13 +34,9 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
   TMPDIR=$(mktemp -d)
   /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
-  /usr/bin/ditto "${TMPDIR}"/"${bundleName}.app" "${appInstallPath}"/"${bundleName}.app"
-  /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
-  /usr/sbin/chown -R root:admin "${appInstallPath}"/"${bundleName}.app"
-  /bin/chmod -R 755 "${appInstallPath}"/"${bundleName}.app"
+  /usr/bin/find "${TMPDIR}" -name "*.pkg" -exec installer -pkg {} -target / \;
   /usr/bin/hdiutil eject "${TMPDIR}" -quiet
   /bin/rmdir "${TMPDIR}"
   /bin/rm /tmp/"${FILE}"

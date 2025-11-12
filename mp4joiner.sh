@@ -4,9 +4,8 @@ appInstallPath="/Applications"
 bundleName="MP4Joiner"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-downloadURL=$(/usr/bin/curl -s "https://www.mp4joiner.org/en/" | /usr/bin/grep dmg | /usr/bin/xmllint --html --xpath '//*/a' - 2>/dev/null | /usr/bin/grep dmg | /usr/bin/xmllint --xpath '//a/@href' - | /usr/bin/cut -d \" -f 2 -)
-# shellcheck disable=SC1001
-currentVers=$(/bin/echo "${downloadURL}" | /usr/bin/cut -d \- -f 2 -)
+currentVers=$(/usr/bin/curl -s "https://www.mp4joiner.org/en/" | /usr/bin/tr '>' '\n' | /usr/bin/grep dmg | /usr/bin/grep -oE 'MP4Tools-[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/MP4Tools-//')
+downloadURL="https://ixpeering.dl.sourceforge.net/project/mp4joiner/MP4Tools/${currentVers}/MP4Tools-${currentVers}-MacOSX.dmg"
 FILE=${downloadURL##*/}
 
 # compare version numbers
