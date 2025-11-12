@@ -5,8 +5,9 @@ bundleName="GPG Tools"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/version.plist CFBundleShortVersionString 2>/dev/null)
 
 downloadURL=$(/usr/bin/curl -Ls "https://gpgtools.org" | /usr/bin/grep dmg | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - 2>/dev/null)
-currentVers=$(/bin/echo ${downloadURL}| /usr/bin/cut -d "/" -f 4- - | /usr/bin/grep -oE 'GPG_Suite-[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/GPG_Suite-//')
+currentVers=$(/bin/echo "${downloadURL}"| /usr/bin/cut -d "/" -f 4- - | /usr/bin/grep -oE 'GPG_Suite-[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/GPG_Suite-//')
 FILE=${downloadURL##*/}
+SHAHash=$(/usr/bin/curl -Ls "https://gpgtools.org" | /usr/bin/grep SHA256 | /usr/bin/xmllint --html --xpath '//span[2]/text()' - 2>/dev/null)
 
 # compare version numbers
 if [ "${installedVers}" ]; then
@@ -34,6 +35,22 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
+  SHAResult=$(/bin/echo "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  case "${SHAResult}" in
+    *OK)
+      /bin/echo "SHA hash has successfully verifed."
+      ;;
+
+    *FAILED)
+      /bin/echo "SHA hash has failed verification"
+      exit 1
+      ;;
+
+    *)
+      /bin/echo "An unknown error has occured."
+      exit 1
+      ;;
+  esac
   TMPDIR=$(mktemp -d)
   /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
   /usr/bin/find "${TMPDIR}" -name "*.pkg" -exec installer -pkg {} -target / \;
