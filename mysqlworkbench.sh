@@ -23,7 +23,7 @@ MD5Hash=$(/usr/bin/curl -s 'https://dev.mysql.com/downloads/workbench/' \
 
 # compare version numbers
 if [ "${installedVers}" ]; then
-  /bin/echo "v${installedVers} of ${bundleName} is installed."
+  /bin/echo "${bundleName} v${installedVers} is installed."
   installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
   currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
 
@@ -43,7 +43,7 @@ if [ "${installedVers}" ]; then
     /bin/echo "Updating ${bundleName} to v${currentVers}"
   fi
 else
-  /bin/echo "Installing v${currentVers} of ${bundleName}"
+  /bin/echo "Installing ${bundleName} v${currentVers}"
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
