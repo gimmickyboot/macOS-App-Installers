@@ -5,7 +5,7 @@ bundleName="Raspberry Pi Imager"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 downloadURL=$(/usr/bin/curl -sI "https://downloads.raspberrypi.org/imager/imager_latest.dmg" | /usr/bin/grep -i ^Location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
-currentVers=$(basename "${downloadURL}" | /usr/bin/sed -n 's/.*rpi-imager-\([0-9.]*\)\.dmg.*/\1/p')
+currentVers=$(basename "${downloadURL}" | /usr/bin/sed -e 's/imager_//' -e 's/.dmg//')
 FILE=${downloadURL##*/}
 
 # compare version numbers
