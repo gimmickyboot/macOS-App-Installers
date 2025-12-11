@@ -4,10 +4,11 @@ appInstallPath="/Library/KeyAccess"
 bundleName="KeyAccess"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-URL="http://www.sassafras.com/client-download/"
-currentVers=$(/usr/bin/curl -sL "${URL}" | /usr/bin/xmllint --format --html - 2>/dev/null | /usr/bin/grep "KeyAccess.*for Mac" | /usr/bin/awk '{print $2}')
-downloadURL=$(/usr/bin/curl -sL "${URL}" | /usr/bin/tr '>' '\n' | /usr/bin/grep "https.*ksp-client.*pkg" | /usr/bin/cut -d '"' -f 2 | /usr/bin/head -n 1)
+htmlData=$(/usr/bin/curl -s "https://solutions.teamdynamix.com/TDClient/1965/Portal/KB/ArticleDet?ID=169236")
+currentVers=$(/bin/echo "${htmlData}" | /usr/bin/grep "Minor Version" | /usr/bin/awk '{print $3}' | /usr/bin/sed 's/<\/p>//')
+downloadURL=$(/bin/echo "${htmlData}" | /usr/bin/grep -A1 ksp-client.pkg | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - 2>/dev/null | /usr/bin/tail -n 1)
 FILE=${downloadURL##*/}
+SHAHash=$(/bin/echo "${htmlData}" | /usr/bin/grep -A1 ksp-client.pkg | /usr/bin/xmllint --html --xpath '//span/text()' - 2>/dev/null | /usr/bin/tail -n 1 | /usr/bin/awk '{print $2}')
 
 # compare version numbers
 if [ "${installedVers}" ]; then
@@ -35,6 +36,22 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
+  SHAResult=$(/bin/echo "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  case "${SHAResult}" in
+    *OK)
+      /bin/echo "SHA hash has successfully verifed."
+      ;;
+
+    *FAILED)
+      /bin/echo "SHA hash has failed verification"
+      exit 1
+      ;;
+
+    *)
+      /bin/echo "An unknown error has occured."
+      exit 1
+      ;;
+  esac
   /usr/sbin/installer -pkg /tmp/"${FILE}" -target /
   /bin/rm /tmp/"${FILE}"
 fi
