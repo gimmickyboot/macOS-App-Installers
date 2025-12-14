@@ -5,8 +5,8 @@ bundleName="KeyAccess"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 htmlData=$(/usr/bin/curl -s "https://solutions.teamdynamix.com/TDClient/1965/Portal/KB/ArticleDet?ID=169236")
-currentVers=$(/bin/echo "${htmlData}" | /usr/bin/grep "Minor Version" | /usr/bin/awk '{print $3}' | /usr/bin/sed 's/<\/p>//')
-downloadURL=$(/bin/echo "${htmlData}" | /usr/bin/grep -A1 ksp-client.pkg | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - 2>/dev/null | /usr/bin/tail -n 1)
+currentVers=$(/bin/echo "${htmlData}" | /usr/bin/tr '>' '\n' | /usr/bin/grep -A1 "Minor Version" | /usr/bin/tail -n 1 | /usr/bin/sed 's/<\/p//' | /usr/bin/xargs)
+downloadURL=$(/bin/echo "${htmlData}" | /usr/bin/tr '>' '\n' | /usr/bin/grep pkg | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - 2>/dev/null)
 FILE=${downloadURL##*/}
 SHAHash=$(/bin/echo "${htmlData}" | /usr/bin/grep -A1 ksp-client.pkg | /usr/bin/xmllint --html --xpath '//span/text()' - 2>/dev/null | /usr/bin/tail -n 1 | /usr/bin/awk '{print $2}')
 
