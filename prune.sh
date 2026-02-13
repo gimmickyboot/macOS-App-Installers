@@ -8,7 +8,7 @@ gitHubURL="https://github.com/BIG-RAT/Prune"
 latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
 latestReleaseTag=$(basename "${latestReleaseURL}")
 currentVers=$(/bin/echo "${latestReleaseTag}" | /usr/bin/sed 's/v//')
-downloadURL="${gitHubURL}/releases/download/${latestReleaseTag}/${bundleName}.zip"
+downloadURL="${gitHubURL}/releases/download/${latestReleaseTag}/${bundleName}_${latestReleaseTag}.zip"
 FILE=${downloadURL##*/}
 
 # compare version numbers

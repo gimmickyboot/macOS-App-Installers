@@ -4,14 +4,10 @@ appInstallPath="/Applications"
 bundleName="Nitro PDF Pro"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-currentVers=$(curl -s "https://downloads.gonitro.com/macos/pro.rss" | /usr/bin/xmllint --xpath '//rss/channel/item/title/text()' - | head -n 1 | sed 's/[^0-9.]//g')
-case "${currentVers}" in
-  *.0)
-    # currentVers ends in .0. remove this
-    currentVers="${currentVers%.*}"
-    ;;
-esac
-downloadURL="https://downloads.gonitro.com/macos/Nitro%20PDF%20Pro_${currentVers}.dmg"
+xmlDATA=$(/usr/bin/curl -s "https://downloads.gonitro.com/macos/pro.rss")
+appTitle=$(printf '%s' "${xmlDATA}" | /usr/bin/xmllint --xpath '//rss/channel/item/title/text()' - | /usr/bin/head -n 1)
+currentVers=$(printf '%s' "${xmlDATA}" | /usr/bin/xmllint --xpath "//rss/channel/item[title=\"${appTitle}\"]/*[name()=\"sparkle:shortVersionString\"]/text()" -)
+downloadURL=$(printf '%s' "${xmlDATA}" | /usr/bin/xmllint --xpath "string(/rss/channel/item[title=\"${appTitle}\"]/enclosure/@url)" -)
 FILE=${downloadURL##*/}
 
 # compare version numbers
