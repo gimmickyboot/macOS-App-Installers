@@ -7,7 +7,6 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 gitHubURL="https://github.com/macadmins/nudge"
 latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
 currentVers=$(basename "${latestReleaseURL}" | /usr/bin/cut -c 2- -)
-# downloadURL="${gitHubURL}/releases/download/${latestReleaseTag}/Nudge_Suite-${currentVers}.pkg"
 downloadURL="https://github.com$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/grep Nudge_Suite | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' -)"
 FILE=${downloadURL##*/}
 

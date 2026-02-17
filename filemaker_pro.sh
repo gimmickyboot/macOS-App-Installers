@@ -6,11 +6,11 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 
 URL="https://www.filemaker.com/redirects/ss.txt"
 if [ "$(/usr/bin/sw_vers -buildVersion | /usr/bin/cut -c 1-2 -)" -ge 24 ]; then
-  majVers=$(/usr/bin/curl -s "${URL}" | /usr/bin/grep "PRO..MAC\"" | /usr/bin/tail -n 1 | /usr/bin/sed 's/,.$//' | /usr/bin/jq -r .file | /usr/bin/sed 's/[a-zA-Z]//g')
-  downloadURL="$(/usr/bin/curl -s "${URL}" | /usr/bin/grep "PRO${majVers}MAC" | /usr/bin/head -n 1 | /usr/bin/sed 's/,.$//' | /usr/bin/jq -r .url)"
+  majVers=$(/usr/bin/curl -s "${URL}" | /usr/bin/grep "PRO..MAC\"" | /usr/bin/tail -n 1 | /usr/bin/sed 's/,$//' | /usr/bin/jq -r .file | /usr/bin/sed 's/[a-zA-Z]//g')
+  downloadURL="$(/usr/bin/curl -s "${URL}" | /usr/bin/grep "PRO${majVers}MAC" | /usr/bin/head -n 1 | /usr/bin/sed 's/,$//' | /usr/bin/jq -r .url)"
 else
-  majVers=$(/usr/bin/curl -s "${URL}" | /usr/bin/grep "PRO..MAC\"" | /usr/bin/tail -n 1 | /usr/bin/sed 's/,.$//' | plutil -extract file raw -o - - | /usr/bin/sed 's/[a-zA-Z]//g')
-  downloadURL="$(/usr/bin/curl -s "${URL}" | /usr/bin/grep "PRO${majVers}MAC" | /usr/bin/head -n 1 | /usr/bin/sed 's/,.$//' | plutil -extract url raw -o - -)"
+  majVers=$(/usr/bin/curl -s "${URL}" | /usr/bin/grep "PRO..MAC\"" | /usr/bin/tail -n 1 | /usr/bin/sed 's/,$//' | plutil -extract file raw -o - - | /usr/bin/sed 's/[a-zA-Z]//g')
+  downloadURL="$(/usr/bin/curl -s "${URL}" | /usr/bin/grep "PRO${majVers}MAC" | /usr/bin/head -n 1 | /usr/bin/sed 's/,$//' | plutil -extract url raw -o - -)"
 fi
 FILE=${downloadURL##*/}
 currentVers="$(/bin/echo "${downloadURL}" | rev | /usr/bin/cut -d "/" -f 1 - | rev | /usr/bin/sed 's/[a-zA-Z_]//g' | /usr/bin/awk -F. '{print $1"."$2"."$3}')"
