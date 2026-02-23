@@ -4,22 +4,10 @@ appInstallPath="/Applications"
 bundleName="MySQLWorkbench"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null | /usr/bin/sed 's/\.CE$//')
 
-currentVers=$(/usr/bin/curl -s 'https://dev.mysql.com/downloads/workbench/' \
-  -H 'sec-ch-ua-platform: "macOS"' \
-  -H 'sec-fetch-dest: document' \
-  -H 'sec-fetch-mode: navigate' \
-  -H 'sec-fetch-site: none' \
-  -H 'sec-fetch-user: ?1' \
-  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36' | /usr/bin/grep -A1 "DMG Archive" | /usr/bin/tail -n 1 | /usr/bin/awk -F'[<>]' '{print $3}')
-downloadURL="https://cdn.mysql.com//Downloads/MySQLGUITools/mysql-workbench-community-${currentVers}-macos-$(uname -m).dmg"
+currentVers=$(/usr/bin/curl -fsL "https://dev.mysql.com/downloads/workbench/?os=33" | /usr/bin/grep -A1 "DMG Archive" | /usr/bin/tail -n 1 | /usr/bin/awk -F'[<>]' '{print $3}')
+downloadURL="https://cdn.mysql.com//Downloads/MySQLGUITools/$(/usr/bin/curl -fsL "https://dev.mysql.com/downloads/workbench/?os=33" | /usr/bin/grep -o "mysql-workbench-community-.*-macos-$(uname -m).dmg" | /usr/bin/head -n1)"
 FILE=${downloadURL##*/}
-MD5Hash=$(/usr/bin/curl -s 'https://dev.mysql.com/downloads/workbench/' \
-  -H 'sec-ch-ua-platform: "macOS"' \
-  -H 'sec-fetch-dest: document' \
-  -H 'sec-fetch-mode: navigate' \
-  -H 'sec-fetch-site: none' \
-  -H 'sec-fetch-user: ?1' \
-  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36' | /usr/bin/grep -A3 "${FILE}" | /usr/bin/grep MD5 | /usr/bin/awk -F'[<>]' '{print $3}')
+MD5Hash=$(/usr/bin/curl -fsL "https://dev.mysql.com/downloads/workbench/?os=33" | /usr/bin/grep -A3 "${FILE}" | /usr/bin/grep MD5 | /usr/bin/awk -F'[<>]' '{print $3}')
 
 # compare version numbers
 if [ "${installedVers}" ]; then
