@@ -38,26 +38,22 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  if [ "${SHAResult}" ]; then
-    SHAResult=$(/bin/echo "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
-    case "${SHAResult}" in
-      *OK)
-        /bin/echo "SHA hash has successfully verifed."
-        ;;
+  SHAResult=$(/bin/echo "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  case "${SHAResult}" in
+    *OK)
+      /bin/echo "SHA hash has successfully verifed."
+      ;;
 
-      *FAILED)
-        /bin/echo "SHA hash has failed verification"
-        exit 1
-        ;;
+    *FAILED)
+      /bin/echo "SHA hash has failed verification"
+      exit 1
+      ;;
 
-      *)
-        /bin/echo "An unknown error has occured."
-        exit 1
-        ;;
-    esac
-  else
-    /bin/echo "No SHAHash. Continuing with install"
-  fi
+    *)
+      /bin/echo "An unknown error has occured."
+      exit 1
+      ;;
+  esac
   /usr/sbin/installer -pkg /tmp/"${FILE}" -target /
   /bin/rm /tmp/"${FILE}"
 fi
