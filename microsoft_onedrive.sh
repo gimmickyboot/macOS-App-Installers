@@ -2,6 +2,7 @@
 
 appInstallPath="/Applications"
 bundleName="Microsoft OneDrive"
+appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409ONDR18.xml')
@@ -11,7 +12,7 @@ FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
-  /bin/echo "${bundleName} v${installedVers} is installed."
+  /bin/echo "${appName} v${installedVers} is installed."
   installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
   currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
 
@@ -25,13 +26,13 @@ if [ "${installedVers}" ]; then
   done
 
   if [ "${installedVersNoDots}" -ge "${currentVersNoDots}" ]; then
-    /bin/echo "${bundleName} does not need to be updated"
+    /bin/echo "${appName} does not need to be updated"
     exit 0
   else
-    /bin/echo "Updating ${bundleName} to v${currentVers}"
+    /bin/echo "Updating ${appName} to v${currentVers}"
   fi
 else
-  /bin/echo "Installing ${bundleName} v${currentVers}"
+  /bin/echo "Installing ${appName} v${currentVers}"
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then

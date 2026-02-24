@@ -1,8 +1,9 @@
 #!/bin/sh
 
 appInstallPath="/usr/local/bin"
-bundleName=""
-installedVers=$("${appInstallPath}"/mafft --version 2>&1 | /usr/bin/awk '{print $1}' | /usr/bin/sed 's/[^0-9.]//g')
+bundleName="mafft"
+appName="${bundleName}"
+installedVers=$("${appInstallPath}"/${bundleName} --version 2>&1 | /usr/bin/awk '{print $1}' | /usr/bin/sed 's/[^0-9.]//g')
 
 URL="https://mafft.cbrc.jp/alignment/software"
 FILE=$(/usr/bin/curl -s "${URL}/macstandard.html" | /usr/bin/grep signed | /usr/bin/xmllint --html --xpath '//a/text()' - | /usr/bin/sort | /usr/bin/tail -n 1 | /usr/bin/sed 's/\?.*//')
@@ -11,7 +12,7 @@ downloadURL="${URL}/${FILE}"
 
 # compare version numbers
 if [ "${installedVers}" ]; then
-  /bin/echo "${bundleName} v${installedVers} is installed."
+  /bin/echo "${appName} v${installedVers} is installed."
   installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
   currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
 
@@ -25,13 +26,13 @@ if [ "${installedVers}" ]; then
   done
 
   if [ "${installedVersNoDots}" -ge "${currentVersNoDots}" ]; then
-    /bin/echo "${bundleName} does not need to be updated"
+    /bin/echo "${appName} does not need to be updated"
     exit 0
   else
-    /bin/echo "Updating ${bundleName} to v${currentVers}"
+    /bin/echo "Updating ${appName} to v${currentVers}"
   fi
 else
-  /bin/echo "Installing ${bundleName} v${currentVers}"
+  /bin/echo "Installing ${appName} v${currentVers}"
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then

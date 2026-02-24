@@ -2,6 +2,7 @@
 
 appInstallPath="/usr/local/bin"
 bundleName="jq"
+appName="${bundleName}"
 # shellcheck disable=SC1001
 installedVers=$("${appInstallPath}/${bundleName}" --version | /usr/bin/cut -d \- -f 2- -)
 
@@ -29,7 +30,7 @@ SHAHash=$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 
 
 # compare version numbers
 if [ "${installedVers}" ]; then
-  /bin/echo "${bundleName} v${installedVers} is installed."
+  /bin/echo "${appName} v${installedVers} is installed."
   installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
   currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
 
@@ -43,13 +44,13 @@ if [ "${installedVers}" ]; then
   done
 
   if [ "${installedVersNoDots}" -ge "${currentVersNoDots}" ]; then
-    /bin/echo "${bundleName} does not need to be updated"
+    /bin/echo "${appName} does not need to be updated"
     exit 0
   else
-    /bin/echo "Updating ${bundleName} to v${currentVers}"
+    /bin/echo "Updating ${appName} to v${currentVers}"
   fi
 else
-  /bin/echo "Installing ${bundleName} v${currentVers}"
+  /bin/echo "Installing ${appName} v${currentVers}"
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then

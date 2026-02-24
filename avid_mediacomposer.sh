@@ -4,6 +4,7 @@ downloadURL=""  # get this from within your Avid account
 
 appInstallPath="/Applications/Avid Media Composer"
 bundleName="AvidMediaComposer"
+appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleVersion 2>/dev/null)
 
 currentVers=$(/usr/bin/curl -s "https://kb.avid.com/pkb/articles/en_US/Knowledge/en267087" | /usr/bin/grep -A 2 "Media Composer Version Matrix" | /usr/bin/xmllint --html --xpath '//*/tr[2]/td[2]/text()' - 2>/dev/null | /usr/bin/cut -c 3- - | /usr/bin/sed 's/[^0-9.]//g')
@@ -24,7 +25,7 @@ FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
-  /bin/echo "${bundleName} v${installedVers} is installed."
+  /bin/echo "${appName} v${installedVers} is installed."
   installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
   currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
 
@@ -38,13 +39,13 @@ if [ "${installedVers}" ]; then
   done
 
   if [ "${installedVersNoDots}" -ge "${currentVersNoDots}" ]; then
-    /bin/echo "${bundleName} does not need to be updated"
+    /bin/echo "${appName} does not need to be updated"
     exit 0
   else
-    /bin/echo "Updating ${bundleName} to v${currentVers}"
+    /bin/echo "Updating ${appName} to v${currentVers}"
   fi
 else
-  /bin/echo "Installing ${bundleName} v${currentVers}"
+  /bin/echo "Installing ${appName} v${currentVers}"
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
