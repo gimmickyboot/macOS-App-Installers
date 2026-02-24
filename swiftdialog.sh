@@ -2,15 +2,13 @@
 
 appInstallPath="/Library/Application Support/Dialog"
 bundleName="Dialog"
-appName="${bundleName}"
+appName="Swift Dialog"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 gitHubURL="https://github.com/swiftDialog/swiftDialog"
 latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
-latestReleaseTag=$(/bin/echo "${latestReleaseURL}" | rev | /usr/bin/awk -F "/" '{print $1}' | rev)
-currentVers=$(/bin/echo "${latestReleaseTag}" | /usr/bin/sed 's/v//')
-assetsURL=$(/usr/bin/curl -s "${latestReleaseURL}" | /usr/bin/grep expanded_assets | /usr/bin/xmllint --html --xpath '//*/include-fragment/@src' - 2>/dev/null | /usr/bin/awk -F \" '{print $2}')
-downloadURL="${gitHubURL}/$(/usr/bin/curl -s "${assetsURL}" | /usr/bin/tr '"' "\n" | /usr/bin/grep pkg | /usr/bin/cut -d "/" -f 4- -)"
+currentVers=$(basename "${latestReleaseURL}" | /usr/bin/tr -d '[:alpha:]' | /usr/bin/sed 's/-//')
+downloadURL="https://github.com$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/grep pkg | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' -)"
 FILE=${downloadURL##*/}
 SHAHash=$(/usr/bin/curl -sL "$(/bin/echo "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/awk "f&&/sha256:/{print; exit} /${FILE}/{f=1}"| /usr/bin/sed -E 's/.*sha256:([0-9a-fA-F]{64}).*/\1/')
 
