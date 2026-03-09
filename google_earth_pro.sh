@@ -5,7 +5,7 @@ bundleName="Google Earth Pro"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null | /usr/bin/cut -d . -f 1-3 -)
 
-currentVers=$(/usr/bin/curl -s "https://support.google.com/earth/answer/168344?sjid=18200233394791621691-AP" | /usr/bin/grep googleearthpromac | /usr/bin/head -n 1 | /usr/bin/xmllint --xpath '/li/a/text()' - | /usr/bin/sed 's/[^0-9.]//g')
+currentVers=$(/usr/bin/curl -s "https://support.google.com/earth/answer/168344?sjid=18200233394791621691-AP" | /usr/bin/grep googleearthpromac | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath '//a/text()' - | /usr/bin/sed 's/[^0-9.]//g')
 downloadURL="https://dl.google.com/earth/client/advanced/current/GoogleEarthProMac-Intel.dmg"
 FILE=${downloadURL##*/}
 
