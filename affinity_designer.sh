@@ -5,16 +5,16 @@ bundleName="Affinity Designer 2"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-URL="https://store.serif.com/en-gb/update/macos/designer/2/"
-currentVers=$(/usr/bin/curl -s "${URL}" | /usr/bin/grep -i -o -E "https.*\.dmg" | /usr/bin/sort | /usr/bin/tail -n1 | /usr/bin/tr "-" "\n" | /usr/bin/grep dmg | /usr/bin/sed -E 's/([0-9.]*)\.dmg/\1/g')
-downloadURL=$(/usr/bin/curl -s "${URL}" | /usr/bin/grep -i -o -E "https.*\.dmg.*\"" | /usr/bin/sort | /usr/bin/tail -n1 | /usr/bin/sed -e 's/.$//' -e 's/&amp;/\&/g')
+htmlData=$(/usr/bin/curl -s "https://store.serif.com/en-gb/update/macos/designer/2/")
+currentVers=$(printf '%s' "${htmlData}" | /usr/bin/grep -i -o -E "https.*\.dmg" | /usr/bin/sort | /usr/bin/tail -n1 | /usr/bin/tr "-" "\n" | /usr/bin/grep dmg | /usr/bin/sed -E 's/([0-9.]*)\.dmg/\1/g')
+downloadURL=$(printf '%s' "${htmlData}" | /usr/bin/grep -i -o -E "https.*\.dmg.*\"" | /usr/bin/sort | /usr/bin/tail -n1 | /usr/bin/sed -e 's/.$//' -e 's/&amp;/\&/g')
 FILE="affinity-designer-${currentVers}.dmg"
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

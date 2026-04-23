@@ -6,15 +6,15 @@ appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409ONDR18.xml')
-currentVers=$(/bin/echo "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $3}')
-downloadURL=$(/bin/echo "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Location"]/following-sibling::string[1])' -)
+currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $3}')
+downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Location"]/following-sibling::string[1])' -)
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

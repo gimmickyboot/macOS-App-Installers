@@ -10,21 +10,21 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 
 jSON=$(/usr/bin/curl -s "https://${adminDomain}/api/v1/artifacts/OKTA_VERIFY_MACOS/latest?releaseChannel=GA")
 if [ "$(/usr/bin/sw_vers -buildVersion | /usr/bin/cut -c 1-2 -)" -ge 24 ]; then
-  currentVers=$(/bin/echo "${jSON}" | /usr/bin/jq -r .version)
-  downloadURL="https://${ssoURL}$(/bin/echo "${jSON}" | /usr/bin/jq -r '.files[].href')"
-  SHAHash=$(/bin/echo "${jSON}" | /usr/bin/jq -r '.files[].fileHashes."SHA-256"')
+  currentVers=$(printf '%s' "${jSON}" | /usr/bin/jq -r .version)
+  downloadURL="https://${ssoURL}$(printf '%s' "${jSON}" | /usr/bin/jq -r '.files[].href')"
+  SHAHash=$(printf '%s' "${jSON}" | /usr/bin/jq -r '.files[].fileHashes."SHA-256"')
 else
-  currentVers=$(/bin/echo "${jSON}" | /usr/bin/plutil -extract version raw -o - -)
-  downloadURL="https://${ssoURL}$(/bin/echo "${jSON}" | plutil -extract files.0.href raw -o - -)"
-  SHAHash=$(/bin/echo "${jSON}" | /usr/bin/plutil -extract files.0.fileHashes.SHA-256 raw -o - -)
+  currentVers=$(printf '%s' "${jSON}" | /usr/bin/plutil -extract version raw -o - -)
+  downloadURL="https://${ssoURL}$(printf '%s' "${jSON}" | plutil -extract files.0.href raw -o - -)"
+  SHAHash=$(printf '%s' "${jSON}" | /usr/bin/plutil -extract files.0.fileHashes.SHA-256 raw -o - -)
 fi
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}
@@ -47,7 +47,7 @@ fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
   # verify the hash
-  SHAResult=$(/bin/echo "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  SHAResult=$(printf '%s' "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
   case "${SHAResult}" in
     *OK)
       /bin/echo "SHA hash has successfully verifed."

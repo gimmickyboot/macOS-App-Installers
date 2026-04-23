@@ -10,16 +10,16 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 jqBin=$(whereis -bq jq)
 
 jSON=$(/usr/bin/curl -s "https://edgeupdates.microsoft.com/api/products/stable")
-currentVers=$(/bin/echo "${jSON}" | "${jqBin}" -r '.[]|.Releases[] | select(.Platform == "MacOS").ProductVersion')
-downloadURL=$(/bin/echo "${jSON}" | "${jqBin}" -r '.[]|.Releases[] | select(.Platform == "MacOS").Artifacts[0].Location')
-SHAHash=$(/bin/echo "${jSON}" | "${jqBin}" -r '.[]|.Releases[] | select(.Platform == "MacOS").Artifacts[0].Hash')
+currentVers=$(printf '%s' "${jSON}" | "${jqBin}" -r '.[]|.Releases[] | select(.Platform == "MacOS").ProductVersion')
+downloadURL=$(printf '%s' "${jSON}" | "${jqBin}" -r '.[]|.Releases[] | select(.Platform == "MacOS").Artifacts[0].Location')
+SHAHash=$(printf '%s' "${jSON}" | "${jqBin}" -r '.[]|.Releases[] | select(.Platform == "MacOS").Artifacts[0].Hash')
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}
@@ -42,7 +42,7 @@ fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
   # verify the hash
-  SHAResult=$(/bin/echo "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  SHAResult=$(printf '%s' "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
   case "${SHAResult}" in
     *OK)
       /bin/echo "SHA hash has successfully verifed."

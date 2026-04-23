@@ -5,22 +5,22 @@ bundleName="FileMaker Pro"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-URL="https://www.filemaker.com/redirects/ss.txt"
+htmlData=$(/usr/bin/curl -s "https://www.filemaker.com/redirects/ss.txt")
 if [ "$(/usr/bin/sw_vers -buildVersion | /usr/bin/cut -c 1-2 -)" -ge 24 ]; then
-  majVers=$(/usr/bin/curl -s "${URL}" | /usr/bin/grep "PRO..MAC\"" | /usr/bin/tail -n 1 | /usr/bin/sed 's/,$//' | /usr/bin/jq -r .file | /usr/bin/sed 's/[a-zA-Z]//g')
-  downloadURL="$(/usr/bin/curl -s "${URL}" | /usr/bin/grep "PRO${majVers}MAC" | /usr/bin/head -n 1 | /usr/bin/sed 's/,$//' | /usr/bin/jq -r .url)"
+  majVers=$(printf '%s' "${htmlData}" | /usr/bin/grep "PRO..MAC\"" | /usr/bin/tail -n 1 | /usr/bin/sed 's/,$//' | /usr/bin/jq -r .file | /usr/bin/sed 's/[a-zA-Z]//g')
+  downloadURL="$(printf '%s' "${htmlData}" | /usr/bin/grep "PRO${majVers}MAC" | /usr/bin/head -n 1 | /usr/bin/sed 's/,$//' | /usr/bin/jq -r .url)"
 else
-  majVers=$(/usr/bin/curl -s "${URL}" | /usr/bin/grep "PRO..MAC\"" | /usr/bin/tail -n 1 | /usr/bin/sed 's/,$//' | plutil -extract file raw -o - - | /usr/bin/sed 's/[a-zA-Z]//g')
-  downloadURL="$(/usr/bin/curl -s "${URL}" | /usr/bin/grep "PRO${majVers}MAC" | /usr/bin/head -n 1 | /usr/bin/sed 's/,$//' | plutil -extract url raw -o - -)"
+  majVers=$(printf '%s' "${htmlData}" | /usr/bin/grep "PRO..MAC\"" | /usr/bin/tail -n 1 | /usr/bin/sed 's/,$//' | plutil -extract file raw -o - - | /usr/bin/sed 's/[a-zA-Z]//g')
+  downloadURL="$(printf '%s' "${htmlData}" | /usr/bin/grep "PRO${majVers}MAC" | /usr/bin/head -n 1 | /usr/bin/sed 's/,$//' | plutil -extract url raw -o - -)"
 fi
 FILE=${downloadURL##*/}
-currentVers="$(/bin/echo "${downloadURL}" | rev | /usr/bin/cut -d "/" -f 1 - | rev | /usr/bin/sed 's/[a-zA-Z_]//g' | /usr/bin/awk -F. '{print $1"."$2"."$3}')"
+currentVers="$(printf '%s' "${downloadURL}" | rev | /usr/bin/cut -d "/" -f 1 - | rev | /usr/bin/sed 's/[a-zA-Z_]//g' | /usr/bin/awk -F. '{print $1"."$2"."$3}')"
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

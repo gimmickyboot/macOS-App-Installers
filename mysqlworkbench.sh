@@ -6,15 +6,29 @@ appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null | /usr/bin/sed 's/\.CE$//')
 
 currentVers=$(/usr/bin/curl -fsL "https://dev.mysql.com/downloads/workbench/?os=33" | /usr/bin/grep -A1 "DMG Archive" | /usr/bin/tail -n 1 | /usr/bin/awk -F'[<>]' '{print $3}')
-downloadURL="https://cdn.mysql.com//Downloads/MySQLGUITools/$(/usr/bin/curl -fsL "https://dev.mysql.com/downloads/workbench/?os=33" | /usr/bin/grep -o "mysql-workbench-community-.*-macos-$(uname -m).dmg" | /usr/bin/head -n1)"
+case $(uname -m) in
+  arm64)
+    archType="arm64"
+    ;;
+
+  x86_64)
+    archType="x86_64"
+    ;;
+
+  *)
+    /bin/echo "Unknown processor architecture. Exiting"
+    exit 1
+    ;;
+esac
+downloadURL="https://cdn.mysql.com//Downloads/MySQLGUITools/$(/usr/bin/curl -fsL "https://dev.mysql.com/downloads/workbench/?os=33" | /usr/bin/grep -o "mysql-workbench-community-.*-macos-${archType}.dmg" | /usr/bin/head -n1)"
 FILE=${downloadURL##*/}
 MD5Hash=$(/usr/bin/curl -fsL "https://dev.mysql.com/downloads/workbench/?os=33" | /usr/bin/grep -A3 "${FILE}" | /usr/bin/grep MD5 | /usr/bin/awk -F'[<>]' '{print $3}')
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}
@@ -36,7 +50,7 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  MD5Hash=$(/bin/echo "${MD5Hash} */tmp/${FILE}" | /sbin/md5sum -c - 2>/dev/null)
+  MD5Hash=$(printf '%s' "${MD5Hash} */tmp/${FILE}" | /sbin/md5sum -c - 2>/dev/null)
   case "${MD5Hash}" in
     *OK)
       /bin/echo "MD5 hash has successfully verifed."

@@ -20,14 +20,14 @@ case $(uname -m) in
     exit 1
 esac
 downloadURL="${URL}$(/usr/bin/curl -sI "${URL}"/software/cycliqplus/macos-"${archType}"/ | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//')"
-currentVers=$(/bin/echo "${downloadURL}" | /usr/bin/grep -oE "CycliqPlus-[0-9]+(\.[0-9]+)*" | /usr/bin/sed 's/[a-zA-Z-]//g')
+currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/grep -oE "CycliqPlus-[0-9]+(\.[0-9]+)*" | /usr/bin/sed 's/[a-zA-Z-]//g')
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

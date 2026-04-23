@@ -6,14 +6,14 @@ appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 currentVers=$(/usr/bin/curl -s "https://support.techsmith.com/hc/en-us/articles/37938520706957-Snagit-Mac-2025-Version-History" | /usr/bin/xmllint --html --xpath '//*/head/meta[2]/@content' - 2>/dev/null | /usr/bin/cut -d \" -f 2- - | /usr/bin/grep -oE 'in[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+' | /usr/bin/awk '{print $2}')
-downloadURL="https://download.techsmith.com/snagitmac/releases/$(/bin/echo "${currentVers}" | /usr/bin/cut -c 3- - | /usr/bin/sed 's/\.//g')/snagit.dmg"
+downloadURL="https://download.techsmith.com/snagitmac/releases/$(printf '%s' "${currentVers}" | /usr/bin/cut -c 3- - | /usr/bin/sed 's/\.//g')/snagit.dmg"
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

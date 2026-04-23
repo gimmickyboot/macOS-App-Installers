@@ -6,15 +6,15 @@ appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 xmlData=$(/usr/bin/curl -s "https://www.alfredapp.com/app/update5/general.xml")
-currentVers=$(/bin/echo "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="version"]/following-sibling::*[1])' -)
-downloadURL=$(/bin/echo "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="location"]/following-sibling::*[1])' -)
+currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="version"]/following-sibling::*[1])' -)
+downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="location"]/following-sibling::*[1])' -)
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

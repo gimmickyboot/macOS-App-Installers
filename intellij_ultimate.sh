@@ -19,14 +19,14 @@ case $(uname -m) in
     exit 1
 esac
 downloadURL=$(/usr/bin/curl -sIL "https://download.jetbrains.com/product?code=II&latest&distribution=${dstType}" | /usr/bin/grep -i ^location | /usr/bin/tail -1 | /usr/bin/awk '{print $2}'| /usr/bin/sed 's/\r//g')
-currentVers=$(/bin/echo "${downloadURL}" | /usr/bin/sed -E 's/.*\/[a-zA-Z-]*-([0-9.]*).*[-.].*dmg/\1/g')
+currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/sed -E 's/.*\/[a-zA-Z-]*-([0-9.]*).*[-.].*dmg/\1/g')
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

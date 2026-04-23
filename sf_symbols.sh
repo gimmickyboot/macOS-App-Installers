@@ -5,15 +5,15 @@ bundleName=$(/usr/bin/find /Applications -name "SF Symbols*" -maxdepth 1 | /usr/
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleVersion 2>/dev/null)
 
-downloadURL=$(/usr/bin/curl -fs "https://developer.apple.com/sf-symbols/" | /usr/bin/grep dmg | head -n 1 | /usr/bin/cut -d \" -f 2 -)
-currentVers=$(/bin/echo "${downloadURL}" | /usr/bin/grep -oE 'SF-Symbols-[0-9]' | /usr/bin/sed 's/SF-Symbols-//')
+downloadURL=$(/usr/bin/curl -fs "https://developer.apple.com/sf-symbols/" | /usr/bin/grep dmg | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - | /usr/bin/sed 's/?2//')
+currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/grep -oE 'SF-Symbols-[0-9]' | /usr/bin/sed 's/SF-Symbols-//')
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

@@ -7,14 +7,14 @@ installedVers=$("${appInstallPath}"/${bundleName} --version 2>&1 | /usr/bin/awk 
 
 URL="https://mafft.cbrc.jp/alignment/software"
 FILE=$(/usr/bin/curl -s "${URL}/macstandard.html" | /usr/bin/grep signed | /usr/bin/xmllint --html --xpath '//a/text()' - | /usr/bin/sort | /usr/bin/tail -n 1 | /usr/bin/sed 's/\?.*//')
-currentVers="$(/bin/echo "${FILE}" | /usr/bin/cut -d "-" -f 2 -)"
+currentVers="$(printf '%s' "${FILE}" | /usr/bin/cut -d "-" -f 2 -)"
 downloadURL="${URL}/${FILE}"
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

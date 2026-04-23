@@ -5,15 +5,15 @@ bundleName="BBEdit"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-downloadURL=$(/usr/bin/curl -s "https://www.barebones.com/products/bbedit/" | /usr/bin/grep Download | /usr/bin/tail -n 1 | /usr/bin/xmllint --xpath '//a/@href' - | /usr/bin/cut -d \" -f 2 -)
+downloadURL=$(/usr/bin/curl -s "https://www.barebones.com/products/bbedit/" | /usr/bin/grep dmg | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - 2>/dev/null)
 currentVers=$(basename "${downloadURL}" | /usr/bin/sed -n 's/.*_\([0-9.]*\)\.dmg/\1/p')
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

@@ -7,13 +7,13 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 
 currentVers=$(/usr/bin/curl -s "https://freemind.sourceforge.io/wiki/index.php/Download" | /usr/bin/grep "stable release" | /usr/bin/xmllint --html --xpath '//p/text()' - | /usr/bin/awk '{print $8}' | /usr/bin/sed 's/.$//')
 downloadURL="http://prdownloads.sourceforge.net/freemind/FreeMind_${currentVers}.dmg?download"
-FILE=$(/bin/echo "${downloadURL##*/}" | /usr/bin/sed 's/?download//')
+FILE=$(printf '%s' "${downloadURL##*/}" | /usr/bin/sed 's/?download//')
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

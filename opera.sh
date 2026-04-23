@@ -8,14 +8,14 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 linkOne=$(/usr/bin/curl -sI "https://download.opera.com/download/get/?partner=www&opsys=MacOS" | /usr/bin/grep -i "^location" | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//')
 linkTwo=$(/usr/bin/curl -sL "${linkOne}" | /usr/bin/grep "thanks-download-link" | /usr/bin/xmllint --html --xpath 'string(//html/body/p/a/@href)' - 2>/dev/null | /usr/bin/sed 's/\&amp;/\&/g')
 downloadURL=$(/usr/bin/curl -sI "${linkTwo}" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//')
-currentVers=$(/bin/echo "${downloadURL}" | /usr/bin/grep -oE 'desktop/[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/desktop\///g')
+currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/grep -oE 'desktop/[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/desktop\///g')
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

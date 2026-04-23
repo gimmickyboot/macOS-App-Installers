@@ -7,14 +7,14 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 
 URL="https://mestrelab.com"
 downloadURL="${URL}$(/usr/bin/curl -s "${URL}/download" | /usr/bin/grep "latest version" | /usr/bin/grep dmg | /usr/bin/xmllint --html --xpath '//li/a[contains(@href, "dmg")]/@href' - 2>/dev/null | /usr/bin/cut -d \" -f 2 -)"
-currentVers=$(/bin/echo "${downloadURL}" | /usr/bin/cut -d "-" -f 2 -)
+currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/cut -d "-" -f 2 -)
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

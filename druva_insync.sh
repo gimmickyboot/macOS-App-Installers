@@ -6,18 +6,18 @@ appInstallPath="/Applications"
 bundleName="Druva inSync"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
-jqBin=$(whereis -qb /usr/bin/jq)
+jqBin=$(whereis -qb jq)
 
 jsonData=$(/usr/bin/curl -s "https://downloads.druva.com/insync/js/data.json")
-currentVers=$(/bin/echo "${jsonData}" | "${jqBin}" -r '.[] | select(.title=="macOS").supportedVersions[]' | /usr/bin/sort -V | /usr/bin/tail -n 1)
-downloadURL=$(/bin/echo "${jsonData}" | "${jqBin}"  -r ".[] | select(.title==\"macOS\").installerDetails[] | select(.version==\"${currentVers}\").downloadURL" | /usr/bin/grep -v "Gov")
+currentVers=$(printf '%s' "${jsonData}" | "${jqBin}" -r '.[] | select(.title=="macOS").supportedVersions[]' | /usr/bin/sort -V | /usr/bin/tail -n 1)
+downloadURL=$(printf '%s' "${jsonData}" | "${jqBin}"  -r ".[] | select(.title==\"macOS\").installerDetails[] | select(.version==\"${currentVers}\").downloadURL" | /usr/bin/grep -v "Gov")
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

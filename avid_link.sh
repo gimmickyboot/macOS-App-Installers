@@ -6,14 +6,14 @@ appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleVersion 2>/dev/null)
 
 downloadURL=$(/usr/bin/curl -s "https://www.avid.com/products/avid-link#Downloads" | /usr/bin/grep macOS | /usr/bin/xmllint --html --xpath "//script[@id='__NEXT_DATA__']/text()" - 2>/dev/null | /usr/bin/sed -e 's/<!\[CDATA\[//' -e 's/]]>$//' | /usr/bin/grep -oE 'https?://[^"]+\.pkg' | /usr/bin/head -n 1)
-currentVers=$(/bin/echo "${downloadURL}" | /usr/bin/rev | /usr/bin/cut -d "/" -f 1 - | /usr/bin/cut -c 5- - | /usr/bin/rev | /usr/bin/sed 's/[^0-9.]//g')
+currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/rev | /usr/bin/cut -d "/" -f 1 - | /usr/bin/cut -c 5- - | /usr/bin/rev | /usr/bin/sed 's/[^0-9.]//g')
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

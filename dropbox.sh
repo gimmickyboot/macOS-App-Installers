@@ -7,26 +7,26 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 
 case $(uname -m) in
   arm64)
-    downloadURL="https://www.dropbox.com/download?plat=mac&full=1&arch=arm64"
+    urlAppend="&arch=arm64"
     ;;
 
   x86_64)
-    downloadURL="https://www.dropbox.com/download?plat=mac&full=1"
+    urlAppend=""
     ;;
 
   *)
     /bin/echo "Unknown processor type. Exiting"
     exit 1
 esac
-
+downloadURL="https://www.dropbox.com/download?plat=mac&full=1${urlAppend}"
 FILE=${downloadURL##*/}
 currentVers=$(curl -sI "${downloadURL}" | /usr/bin/grep -i ^Location | /usr/bin/awk '{print $2}' | /usr/bin/sed -E 's/.*%20([0-9.]*)/\1/g' | rev | /usr/bin/cut -d . -f 3- - | rev)
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

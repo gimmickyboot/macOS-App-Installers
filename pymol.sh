@@ -7,13 +7,13 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 
 downloadURL=$(/usr/bin/curl -s "https://www.pymol.org/" | /usr/bin/grep dmg | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//*/a/@href)' - 2>/dev/null)
 FILE=${downloadURL##*/}
-currentVers=$(/bin/echo "${FILE}" | /usr/bin/grep -Eo '[0-9]+(\.[0-9]+)+')
+currentVers=$(printf '%s' "${FILE}" | /usr/bin/grep -Eo '[0-9]+(\.[0-9]+)+')
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

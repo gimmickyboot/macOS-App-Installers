@@ -20,15 +20,15 @@ case "$(uname -m)" in
     ;;
 esac
 BBXML=$(/usr/bin/curl -s "https://updates.bravesoftware.com/sparkle/Brave-Browser/${URLpath}/appcast.xml")
-currentVers=$(/bin/echo "${BBXML}" | /usr/bin/sed 's/sparkle://g' | /usr/bin/xmllint --xpath '/rss/channel/item[last()]/enclosure/@version' - | /usr/bin/awk -F\" '{print $2}')
-downloadURL=$(/bin/echo "${BBXML}" | /usr/bin/xmllint --xpath '//rss/channel/item[last()]/enclosure/@url' - | /usr/bin/awk -F\" '{print $2}')
+currentVers=$(printf '%s' "${BBXML}" | /usr/bin/sed 's/sparkle://g' | /usr/bin/xmllint --xpath '/rss/channel/item[last()]/enclosure/@version' - | /usr/bin/awk -F\" '{print $2}')
+downloadURL=$(printf '%s' "${BBXML}" | /usr/bin/xmllint --xpath '//rss/channel/item[last()]/enclosure/@url' - | /usr/bin/awk -F\" '{print $2}')
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

@@ -7,8 +7,8 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 
 i=15
 while true; do
-  theResult=$(curl -sLI "https://parallels.com/directdownload/pd${i}/" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/tail -n 1 | /usr/bin/sed 's/\r//')
-  if /bin/echo "${theResult}" | grep -vq '\.dmg*'; then
+  theResult=$(/usr/bin/curl -sLI "https://parallels.com/directdownload/pd${i}/" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/tail -n 1 | /usr/bin/sed 's/\r//')
+  if printf '%s' "${theResult}" | /usr/bin/grep -vq '\.dmg*'; then
     majVers=$((i-1))
     break
   else
@@ -16,15 +16,15 @@ while true; do
   fi
 done
 xmlData=$(/usr/bin/curl -s "https://update.parallels.com/desktop/v${majVers}/parallels/parallels_updates.xml")
-downloadURL=$(/bin/echo "${xmlData}" | /usr/bin/xmllint --xpath '(//Product/Version/Update/FilePath)[1]/text()' -)
-currentVers=$(/bin/echo "${xmlData}" | /usr/bin/xmllint --xpath "concat(//Major/text(), '.', //Minor/text(), '.', //SubMinor/text())" -)
+downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath '(//Product/Version/Update/FilePath)[1]/text()' -)
+currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath "concat(//Major/text(), '.', //Minor/text(), '.', //SubMinor/text())" -)
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

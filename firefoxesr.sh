@@ -5,21 +5,22 @@ bundleName="Firefox"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
+htmlData=$(/usr/bin/curl -fs "https://product-details.mozilla.org/1.0/firefox_versions.json")
 if $(sw_vers -buildVersion | /usr/bin/cut -c 1-2 -) -ge 24; then
-  currentVers=$(/usr/bin/curl -fs "https://product-details.mozilla.org/1.0/firefox_versions.json" | /usr/bin/jq -r .FIREFOX_ESR)
+  currentVers=$(printf '%s' "${htmlData}" | /usr/bin/jq -r .FIREFOX_ESR)
 else
-  currentVers=$(/usr/bin/curl -fs "https://product-details.mozilla.org/1.0/firefox_versions.json" | /usr/bin/plutil -extract FIREFOX_ESR raw -o - -)
+  currentVers=$(printf '%s' "${htmlData}" | /usr/bin/plutil -extract FIREFOX_ESR raw -o - -)
 fi
 downloadURL="https://download-installer.cdn.mozilla.net/pub/firefox/releases/${currentVers}/mac/en-US/Firefox%20${currentVers}.dmg"
 FILE=${downloadURL##*/}
 # strip esr from currentVers for version check
-currentVers=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/esr//')
+currentVers=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/esr//')
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

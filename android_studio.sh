@@ -23,13 +23,13 @@ esac
 downloadURL=$(/usr/bin/curl -s "https://developer.android.com/studio" | /usr/bin/grep android-studio | /usr/bin/grep "${dmgName}" | /usr/bin/grep href | /usr/bin/head -n 1 | /usr/bin/cut -d \" -f 2 -)
 FILE=${downloadURL##*/}
 # shellcheck disable=SC1001
-currentVers=$(/bin/echo "${FILE}" | /usr/bin/cut -d \- -f 3 - | /usr/bin/cut -d . -f 1-2 -)
+currentVers=$(printf '%s' "${FILE}" | /usr/bin/cut -d \- -f 3 - | /usr/bin/cut -d . -f 1-2 -)
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

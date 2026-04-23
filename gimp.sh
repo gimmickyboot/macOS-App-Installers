@@ -5,18 +5,31 @@ bundleName="GIMP"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-currentVers=$(/usr/bin/curl -s https://www.gimp.org/downloads/ | /usr/bin/grep "The current stable release of GIMP is" | /usr/bin/sed 's/<[^>]*>/\n/g' | /usr/bin/head -n 3 | /usr/bin/tail -n 1)
-majCurrentVers=$(/bin/echo "${currentVers}" | /usr/bin/cut -d . -f 1-2 -)
-#downloadURL="https://mirror.freedif.org/gimp/pub/gimp/v${majCurrentVers}/osx/gimp-${currentVers}-$(uname -m).dmg"
-downloadURL="https://download.gimp.org/gimp/v${majCurrentVers}/macos/gimp-${currentVers}-$(uname -m).dmg"
+case $(uname -m) in
+  arm64)
+    archType="arm64"
+    ;;
+
+  x86_64)
+    archType="x86_64"
+    ;;
+
+  *)
+    /bin/echo "Unknown processor architecture. Exiting"
+    exit 1
+    ;;
+esac
+xmlData=$(/usr/bin/curl -sL "https://gimp.org/downloads" | /usr/bin/xmllint --html --xpath "//*[@id=\"mac-${archType}-buttons\"]/span[1]/a" - 2>/dev/null)
+downloadURL="https:$(printf '%s' "${xmlData}" | /usr/bin/xmllint --html --xpath 'string(//*/a/@href)' -)"
+currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/grep -oE 'gimp-[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/gimp-//')
 FILE=${downloadURL##*/}
-SHAHash=$(curl -s "https://www.gimp.org/downloads/" | /usr/bin/grep "${FILE}" | /usr/bin/grep SHA256 | /usr/bin/xmllint --html --xpath '//*/kbd/text()' -)
+SHAHash=$(/usr/bin/curl -s "https://www.gimp.org/downloads/" | /usr/bin/grep "${FILE}" | /usr/bin/grep SHA256 | /usr/bin/xmllint --html --xpath '//*/kbd/text()' -)
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}
@@ -38,7 +51,7 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  SHAResult=$(/bin/echo "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  SHAResult=$(printf '%s' "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
   case "${SHAResult}" in
     *OK)
       /bin/echo "SHA hash has successfully verifed."

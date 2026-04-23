@@ -5,6 +5,7 @@ bundleName="pgAdmin 4"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
+currentVers=$(/usr/bin/curl -s "https://pgadmin-archive.postgresql.org/pgadmin4/index.html" | /usr/bin/grep 'href="v'  | /usr/bin/tail -n 1 | /usr/bin/xmllint --xpath '//li/a/text()' - | /usr/bin/cut -c 2- -)
 case $(uname -m) in
   arm64)
     archType="arm64"
@@ -19,15 +20,14 @@ case $(uname -m) in
     exit 1
     ;;
 esac
-currentVers=$(/usr/bin/curl -s "https://pgadmin-archive.postgresql.org/pgadmin4/index.html" | /usr/bin/grep 'href="v'  | /usr/bin/tail -n 1 | /usr/bin/xmllint --xpath '//li/a/text()' - | /usr/bin/cut -c 2- -)
 downloadURL="https://pgadmin-archive.postgresql.org/pgadmin4/v${currentVers}/macos/pgadmin4-${currentVers}-${archType}.dmg"
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

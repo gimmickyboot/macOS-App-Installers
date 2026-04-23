@@ -18,8 +18,8 @@ FILE=${downloadURL##*/}
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed -e 's/\.//g' -e 's/-//g' -e 's/[a-zA-Z]//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed -e 's/\.//g' -e 's/-//g' -e 's/[a-zA-Z]//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed -e 's/\.//g' -e 's/-//g' -e 's/[a-zA-Z]//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed -e 's/\.//g' -e 's/-//g' -e 's/[a-zA-Z]//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

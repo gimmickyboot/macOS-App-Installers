@@ -8,14 +8,14 @@ appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 downloadURL=$(/usr/bin/curl -s "https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSRD10.xml" | /usr/bin/grep pkg | /usr/bin/head -n 1 | /usr/bin/sed -e 's/<[^>]*>//g' | xargs)
-currentVers=$(/bin/echo "${downloadURL}" | /usr/bin/grep -oE '[0-9]+(\.[0-9]+)+')
+currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/grep -oE '[0-9]+(\.[0-9]+)+')
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

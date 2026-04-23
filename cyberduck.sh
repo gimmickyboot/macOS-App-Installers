@@ -6,15 +6,15 @@ appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 xmlData=$(/usr/bin/curl -s 'https://version.cyberduck.io/changelog.rss')
-currentVers=$(/bin/echo "${xmlData}" | /usr/bin/xmllint --xpath '//rss/channel/item/enclosure' - | /usr/bin/sed -n 's/.*sparkle:shortVersionString="\([^"]*\)".*/\1/p')
-downloadURL=$(/bin/echo "${xmlData}" | /usr/bin/xmllint --xpath '//rss/channel/item/enclosure' - | /usr/bin/sed -n 's/.*url="\([^"]*\)".*/\1/p' | /usr/bin/sed 's|o//|o/|')
+currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath '//rss/channel/item/enclosure' - | /usr/bin/sed -n 's/.*sparkle:shortVersionString="\([^"]*\)".*/\1/p')
+downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath '//rss/channel/item/enclosure' - | /usr/bin/sed -n 's/.*url="\([^"]*\)".*/\1/p' | /usr/bin/sed 's|o//|o/|')
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

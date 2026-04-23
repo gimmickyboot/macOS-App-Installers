@@ -7,18 +7,18 @@ appName="Python 3"
 URL="https://www.python.org/downloads/"
 downloadURL=$(/usr/bin/curl -s --compressed "${URL}" | /usr/bin/awk '/macos/ && /ftp/ {print;}' | /usr/bin/cut -d \" -f 4 -)
 FILE=${downloadURL##*/}
-currentVers=$(/bin/echo "${FILE}" | /usr/bin/awk -F- '{print $2}')
-currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+currentVers=$(printf '%s' "${FILE}" | /usr/bin/awk -F- '{print $2}')
+currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 SUM=$(/usr/bin/curl -s --compressed "${URL}/release/python-${currentVersNoDots}/" | /usr/bin/grep -A 4 pkg | /usr/bin/head -n 4 | /usr/bin/tail -n 1 | /usr/bin/awk '{print $1}' | /usr/bin/sed -e 's/<td>//' -e 's/<\/td>//')
-shortVers=$(/bin/echo "${currentVers}" | /usr/bin/cut -d . -f 1-2 -)
+shortVers=$(printf '%s' "${currentVers}" | /usr/bin/cut -d . -f 1-2 -)
 
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName} ${shortVers}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

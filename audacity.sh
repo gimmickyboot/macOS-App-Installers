@@ -20,8 +20,8 @@ lameSHAHash=$(/usr/bin/curl -s "${lameURL}/ffmpeg.php" -H "user-agent: ${userAge
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}
@@ -43,7 +43,7 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  SHAResult=$(/bin/echo "${audacitySHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  SHAResult=$(printf '%s' "${audacitySHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
   case "${SHAResult}" in
     *OK)
       /bin/echo "SHA hash has successfully verifed."
@@ -72,7 +72,7 @@ if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL
   /bin/rm /tmp/"${FILE}"
 fi
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${lameURL}/${lameFILE}" -H "referer: ${lameURL}/ffmpeg.php" -H "user-agent: ${userAgent}" -o /tmp/"${lameFILE}"; then
-  SHAResult=$(/bin/echo "${lameSHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  SHAResult=$(printf '%s' "${lameSHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
   case "${SHAResult}" in
     *OK)
       /bin/echo "SHA hash has successfully verifed."

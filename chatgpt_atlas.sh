@@ -6,15 +6,15 @@ appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 XML=$(/usr/bin/curl -s "https://persistent.oaistatic.com/atlas/public/sparkle_public_appcast.xml")
-currentVers=$(/bin/echo "${XML}" | /usr/bin/xmllint --xpath '//rss/channel/item[1]/title/text()' -)
-downloadURL=$(/bin/echo "${XML}" | /usr/bin/xmllint --xpath 'string(//rss/channel/item[1]/enclosure/@url)' -)
+currentVers=$(printf '%s' "${XML}" | /usr/bin/xmllint --xpath '//rss/channel/item[1]/title/text()' -)
+downloadURL=$(printf '%s' "${XML}" | /usr/bin/xmllint --xpath 'string(//rss/channel/item[1]/enclosure/@url)' -)
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

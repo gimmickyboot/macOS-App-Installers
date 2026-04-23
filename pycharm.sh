@@ -10,6 +10,7 @@ appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 jSON=$(/usr/bin/curl -s 'https://data.services.jetbrains.com/products?code=PCP&release.type=release&_=1767045118843')
+currentVers=$(printf '%s' "${jSON}" | "${jqBin}" -r "first(.[].releases[].version)")
 case $(uname -m) in
   arm64)
     archType="macM1"
@@ -23,15 +24,14 @@ case $(uname -m) in
     /bin/echo "Unknown processor type. Exiting"
     exit 1
 esac
-currentVers=$(printf '%s' "${jSON}" | "${jqBin}" -r "first(.[].releases[].version)")
 downloadURL=$(printf '%s' "${jSON}" | "${jqBin}" -r "first(.[].releases[].downloads.${archType}).link")
 SHAHash=$(/usr/bin/curl -s "$(printf '%s' "${jSON}" | "${jqBin}" -r "first(.[].releases[].downloads.${archType}).checksumLink")" | /usr/bin/awk '{print $1}')
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}
@@ -53,7 +53,7 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  SHAResult=$(/bin/echo "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  SHAResult=$(printf '%s' "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
   case "${SHAResult}" in
     *OK)
       /bin/echo "SHA hash has successfully verifed."

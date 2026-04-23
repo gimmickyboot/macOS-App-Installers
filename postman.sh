@@ -15,11 +15,11 @@ else
 fi
 case "$(uname -m)" in
   arm64)
-    downloadURL="https://dl.pstmn.io/download/latest/osx_arm64"
+    urlAppend="osx_arm64"
     ;;
 
   x86_64)
-    downloadURL="https://dl.pstmn.io/download/latest/osx_64"
+    urlAppend="osx_64"
     ;;
 
   *)
@@ -27,13 +27,14 @@ case "$(uname -m)" in
     exit 1
     ;;
 esac
+downloadURL="https://dl.pstmn.io/download/latest/${urlAppend}"
 FILE=$(/usr/bin/curl -sL --head "${downloadURL}" | /usr/bin/grep content-disposition | /usr/bin/awk -F "=" '{print $2}' | tr -d '\r')
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

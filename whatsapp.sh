@@ -6,14 +6,14 @@ appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 downloadURL=$(/usr/bin/curl -sI "https://web.whatsapp.com/desktop/mac_native/release/?configuration=Release" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//')
-currentVers=$(/bin/echo "${downloadURL}" | /usr/bin/grep -oE "WhatsApp-[0-9]+(\.[0-9]+)*" | /usr/bin/sed 's/WhatsApp-2.//')
+currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/grep -oE "WhatsApp-[0-9]+(\.[0-9]+)*" | /usr/bin/sed 's/WhatsApp-2.//')
 FILE="WhatsApp-2.${currentVers}.dmg"
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

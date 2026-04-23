@@ -7,19 +7,19 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 
 jsonData=$(/usr/bin/curl -s "https://update.code.visualstudio.com/api/update/darwin-universal/stable/dc96b837cf6bb4af9cd736aa3af08cf8279f7685")
 if [ "$(/usr/bin/sw_vers -buildVersion | /usr/bin/cut -c 1-2 -)" -ge 24 ]; then
-  currentVers=$(/bin/echo "${jsonData}" | /usr/bin/jq -r .productVersion)
-  downloadURL=$(/bin/echo "${jsonData}" | /usr/bin/jq -r .url)
+  currentVers=$(printf '%s' "${jsonData}" | /usr/bin/jq -r .productVersion)
+  downloadURL=$(printf '%s' "${jsonData}" | /usr/bin/jq -r .url)
 else
-  currentVers=$(/bin/echo "${jsonData}" | /usr/bin/plutil -extract productVersion raw -o - -)
-  downloadURL=$(/bin/echo "${jsonData}" | /usr/bin/plutil -extract url raw -o - -)
+  currentVers=$(printf '%s' "${jsonData}" | /usr/bin/plutil -extract productVersion raw -o - -)
+  downloadURL=$(printf '%s' "${jsonData}" | /usr/bin/plutil -extract url raw -o - -)
 fi
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

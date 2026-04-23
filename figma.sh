@@ -7,19 +7,19 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 
 jSON=$(/usr/bin/curl -s "https://desktop.figma.com/mac-arm/RELEASE.json")
 if [ "$(/usr/bin/sw_vers -buildVersion | /usr/bin/cut -c 1-2 -)" -ge 22 ]; then
-  currentVers=$(/bin/echo "${jSON}" | /usr/bin/jq -r .version)
-  downloadURL=$(/bin/echo "${jSON}" | /usr/bin/jq -r .url)
+  currentVers=$(printf '%s' "${jSON}" | /usr/bin/jq -r .version)
+  downloadURL=$(printf '%s' "${jSON}" | /usr/bin/jq -r .url)
 else
-  currentVers=$(/bin/echo "${jSON}" | /usr/bin/plutil -extract version raw -o - -)
-  downloadURL=$(/bin/echo "${jSON}" | /usr/bin/plutil -extract url raw -o - -)
+  currentVers=$(printf '%s' "${jSON}" | /usr/bin/plutil -extract version raw -o - -)
+  downloadURL=$(printf '%s' "${jSON}" | /usr/bin/plutil -extract url raw -o - -)
 fi
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

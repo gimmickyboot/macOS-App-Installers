@@ -8,11 +8,11 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 currentVers=$(/usr/bin/curl -s "https://help.webex.com/en-us/article/mqkve8/Webex-App-%7C-Release-notes" | /usr/bin/sed 's/<[^>]*>//g' | /usr/bin/grep -E '^\s*Mac—' | /usr/bin/head -n 1 | /usr/bin/sed -e 's/ //g' -e 's/Mac—//')
 case $(uname -m) in
   arm64)
-    downloadURL=$(/usr/bin/curl -s "https://www.webex.com/downloads.html" | /usr/bin/grep "macOS (Apple M1 chip)" | /usr/bin/head -n 1 | /usr/bin/grep -o 'uri="[^"]*' | /usr/bin/sed 's/uri="//')
+    archType="macOS (Apple M1 chip)"
     ;;
 
   x86_64)
-    downloadURL=$(/usr/bin/curl -s "https://www.webex.com/downloads.html" | /usr/bin/grep "macOS (Intel chip)" | /usr/bin/head -n 1 | /usr/bin/grep -o 'uri="[^"]*' | /usr/bin/sed 's/uri="//')
+    archType="macOS (Intel chip)"
     ;;
 
   *)
@@ -20,13 +20,14 @@ case $(uname -m) in
     exit 1
     ;;
 esac
+downloadURL=$(/usr/bin/curl -s "https://www.webex.com/downloads.html" | /usr/bin/grep "${archType}" | /usr/bin/head -n 1 | /usr/bin/grep -o 'uri="[^"]*' | /usr/bin/sed 's/uri="//')
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

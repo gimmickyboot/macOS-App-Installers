@@ -6,16 +6,16 @@ appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 htmlData=$(/usr/bin/curl -s "https://solutions.teamdynamix.com/TDClient/1965/Portal/KB/ArticleDet?ID=169236")
-currentVers=$(/bin/echo "${htmlData}" | /usr/bin/tr '>' '\n' | /usr/bin/grep -A1 "Minor Version" | /usr/bin/tail -n 1 | /usr/bin/sed 's/<\/p//' | /usr/bin/xargs)
-downloadURL=$(/bin/echo "${htmlData}" | /usr/bin/tr '>' '\n' | /usr/bin/grep pkg | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - 2>/dev/null)
+currentVers=$(printf '%s' "${htmlData}" | /usr/bin/tr '>' '\n' | /usr/bin/grep -A1 "Minor Version" | /usr/bin/tail -n 1 | /usr/bin/sed 's/<\/p//' | /usr/bin/xargs)
+downloadURL=$(printf '%s' "${htmlData}" | /usr/bin/tr '>' '\n' | /usr/bin/grep pkg | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - 2>/dev/null)
 FILE=${downloadURL##*/}
-SHAHash=$(/bin/echo "${htmlData}" | /usr/bin/grep -A1 ksp-client.pkg | /usr/bin/xmllint --html --xpath '//span/text()' - 2>/dev/null | /usr/bin/tail -n 1 | /usr/bin/awk '{print $2}')
+SHAHash=$(printf '%s' "${htmlData}" | /usr/bin/grep -A1 ksp-client.pkg | /usr/bin/xmllint --html --xpath '//span/text()' - 2>/dev/null | /usr/bin/tail -n 1 | /usr/bin/awk '{print $2}')
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(/bin/echo "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(/bin/echo "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}
@@ -37,7 +37,7 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  SHAResult=$(/bin/echo "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  SHAResult=$(printf '%s' "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
   case "${SHAResult}" in
     *OK)
       /bin/echo "SHA hash has successfully verifed."
