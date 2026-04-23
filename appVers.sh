@@ -16,7 +16,8 @@
 ME=$(basename "$0")
 # shellcheck disable=SC2034
 BINPATH=$(dirname "$0")
-adminDomain="integrator-1080591-admin.okta.com"  # eg busname-admin.okta.com
+email=""  # add your email here
+adminDomain=""  # eg busname-admin.okta.com
 ssoURL="${adminDomain}"  # eg sso.busname.domain.com or busname.okta.com
 
 ###############################################################################
@@ -1562,6 +1563,6 @@ if [ ! -t 1 ] ; then
   else
     mailArgs="-s"
   fi
-  /usr/bin/mail "${mailArgs}" "App Versions for $(date -I)" "shannonpasto@me.com" < "${theFile}"
+  /usr/bin/mail "${mailArgs}" "App Versions for $(date -I)" "${email}" < "${theFile}"
   /bin/rm "${theFile}"
 fi
