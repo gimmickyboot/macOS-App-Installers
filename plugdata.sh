@@ -5,9 +5,6 @@ bundleName="plugdata"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-# currentVers=$(/usr/bin/curl -s "https://plugdata.org/download.html" | /usr/bin/grep "Latest stable" | xargs | /usr/bin/sed 's/[^0-9.]//g')
-# downloadURL="https://github.com/plugdata-team/plugdata/releases/download/v${currentVers}/plugdata-macOS-Universal.pkg"
-# FILE=${downloadURL##*/}
 gitHubURL="https://github.com/plugdata-team/plugdata"
 latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
 currentVers=$(basename "${latestReleaseURL}" | /usr/bin/tr -d '[:alpha:]' | /usr/bin/sed 's/-//')
