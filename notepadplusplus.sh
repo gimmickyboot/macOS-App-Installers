@@ -1,31 +1,16 @@
 #!/bin/sh
 
 appInstallPath="/Applications"
-bundleName="R"
+bundleName="Notepad++"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-case $(uname -m) in
-  arm64)
-    archType="arm64"
-    prePendURL="sonoma-arm64"
-    ;;
-
-  x86_64)
-    archType="x64"
-    prePendURL="big-sur-arm64"
-    ;;
-
-  *)
-    /bin/echo "Unknown processor architecture. Exiting"
-    exit 1
-    ;;
-esac
-URL="https://cran.rstudio.com/bin/macosx"
-FILE=$(/usr/bin/curl -s "${URL}/" | /usr/bin/sed 's/<[^>]*>//g' | /usr/bin/grep "${archType}.pkg" | /usr/bin/tail -n 1 | /usr/bin/sed 's/ //g')
-currentVers=$(printf '%s' "${FILE}" | /usr/bin/awk -F - '{print $2}')
-downloadURL="${URL}/${prePendURL}/base/${FILE}"
-SHAHash=$(/usr/bin/curl -Ls "${URL}" | /usr/bin/sed 's/<[^>]*>//g' | /usr/bin/grep -A 1 "${FILE}" | /usr/bin/grep SHA1 | /usr/bin/tail -n 1 | /usr/bin/awk -F ";" '{print $2}')
+gitHubURL="https://github.com/notepad-plus-plus-mac/notepad-plus-plus-macos"
+latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
+currentVers=$(basename "${latestReleaseURL}" | /usr/bin/tr -d '[:alpha:]' | /usr/bin/sed 's/-//')
+downloadURL="https://github.com$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/grep dmg | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' -)"
+FILE=${downloadURL##*/}
+SHAHash=$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/xmllint --html --xpath "string(//li[.//span[contains(text(), '${FILE}')]]//span[contains(text(), 'sha256:')])" - 2>/dev/null | /usr/bin/sed 's/^sha256://')
 
 # compare version numbers
 if [ "${installedVers}" ]; then
@@ -53,7 +38,6 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  # verify the hash
   SHAResult=$(printf '%s' "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
   case "${SHAResult}" in
     *OK)
@@ -70,6 +54,14 @@ if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL
       exit 1
       ;;
   esac
-  /usr/sbin/installer -pkg /tmp/"${FILE}" -target /
+  /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
+  TMPDIR=$(mktemp -d)
+  /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
+  /usr/bin/ditto "${TMPDIR}"/"${bundleName}.app" "${appInstallPath}"/"${bundleName}.app"
+  /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
+  /usr/sbin/chown -R root:admin "${appInstallPath}"/"${bundleName}.app"
+  /bin/chmod -R 755 "${appInstallPath}"/"${bundleName}.app"
+  /usr/bin/hdiutil eject "${TMPDIR}" -quiet
+  /bin/rmdir "${TMPDIR}"
   /bin/rm /tmp/"${FILE}"
 fi
