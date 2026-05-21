@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.1 (30/04/2026)
+# v1.0.2 (12/05/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -1030,7 +1030,7 @@ for theApp in $theList; do
             ;;
 
           *)
-            /bin/echo "Unknow architecture. Exiting"
+            /bin/echo "Unknown architecture. Exiting"
             exit 1
             ;;
         esac
@@ -1084,7 +1084,7 @@ for theApp in $theList; do
             ;;
 
         *)
-            /bin/echo "Unknow architecture. Exiting"
+            /bin/echo "Unknown architecture. Exiting"
             exit 1
             ;;
         esac
@@ -1473,13 +1473,13 @@ for theApp in $theList; do
 
     vnc_server)
       jSON=$(/usr/bin/curl -Ls "https://www.realvnc.com/en/connect/download/vnc" -H user-agent:" Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" | /usr/bin/tr '>' '\n' | /usr/bin/grep pkg | /usr/bin/tail -n 1 | /usr/bin/sed 's/<\/script//')
-      currentVers=$(printf '%s\n' "${jSON}" | "${jqBin}" -r '.index.connect.products.vnc.platforms.macos.versions | to_entries | .[0].value.number')
+      currentVers=$(printf '%s' "${jSON}" | "${jqBin}" -r '.index.connect.products.vnc.platforms.macos.versions | to_entries | .[0].value.number')
       downloadURL="https://downloads.realvnc.com/download/file/vnc.files/$(printf '%s\n' "${jSON}" | "${jqBin}" -r '.index.connect.products.vnc.platforms.macos.versions | to_entries | .[0].value.files[].file')"
       ;;
 
     vnc_viewer)
       jSON=$(curl -Ls "https://www.realvnc.com/en/connect/download/viewer" -H user-agent:" Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" | /usr/bin/tr '>' '\n' | /usr/bin/grep dmg | /usr/bin/tail -n 1 | /usr/bin/sed 's/<\/script//')
-      currentVers=$(printf '%s\n' "${jSON}" | "${jqBin}" -r '.index.connect.products.viewer.platforms.macos.versions | to_entries | .[0].value.number')
+      currentVers=$(printf '%s' "${jSON}" | "${jqBin}" -r '.index.connect.products.viewer.platforms.macos.versions | to_entries | .[0].value.number')
       downloadURL="https://downloads.realvnc.com/download/file/viewer.files/$(printf '%s\n' "${jSON}" | "${jqBin}" -r '.index.connect.products.viewer.platforms.macos.versions | to_entries | .[0].value.files[].file')"
       ;;
 
