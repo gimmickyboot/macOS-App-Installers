@@ -16,7 +16,7 @@ case $(uname -m) in
     ;;
 
   *)
-    /bin/echo "Unknown processor architecture. Exiting"
+    printf '%s\n' "Unknown processor architecture. Exiting"
     exit 1
     ;;
 esac
@@ -26,7 +26,7 @@ MD5Hash=$(/usr/bin/curl -fsL "https://dev.mysql.com/downloads/workbench/?os=33" 
 
 # compare version numbers
 if [ "${installedVers}" ]; then
-  /bin/echo "${appName} v${installedVers} is installed."
+  printf '%s\n' "${appName} v${installedVers} is installed."
   installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
   currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
@@ -40,29 +40,29 @@ if [ "${installedVers}" ]; then
   done
 
   if [ "${installedVersNoDots}" -ge "${currentVersNoDots}" ]; then
-    /bin/echo "${appName} does not need to be updated"
+    printf '%s\n' "${appName} does not need to be updated"
     exit 0
   else
-    /bin/echo "Updating ${appName} to v${currentVers}"
+    printf '%s\n' "Updating ${appName} to v${currentVers}"
   fi
 else
-  /bin/echo "Installing ${appName} v${currentVers}"
+  printf '%s\n' "Installing ${appName} v${currentVers}"
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
   MD5Hash=$(printf '%s' "${MD5Hash} */tmp/${FILE}" | /sbin/md5sum -c - 2>/dev/null)
   case "${MD5Hash}" in
     *OK)
-      /bin/echo "MD5 hash has successfully verifed."
+      printf '%s\n' "MD5 hash has successfully verifed."
       ;;
 
     *WARNING)
-      /bin/echo "MD5 hash has failed verification"
+      printf '%s\n' "MD5 hash has failed verification"
       exit 1
       ;;
 
     *)
-      /bin/echo "An unknown error has occured."
+      printf '%s\n' "An unknown error has occured."
       exit 1
       ;;
   esac

@@ -15,7 +15,7 @@ SHAHash=$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 
 
 # compare version numbers
 if [ "${installedVers}" ]; then
-  /bin/echo "${appName} v${installedVers} is installed."
+  printf '%s\n' "${appName} v${installedVers} is installed."
   installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
   currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
 
@@ -29,32 +29,37 @@ if [ "${installedVers}" ]; then
   done
 
   if [ "${installedVersNoDots}" -ge "${currentVersNoDots}" ]; then
-    /bin/echo "${appName} does not need to be updated"
+    printf '%s\n' "${appName} does not need to be updated"
     exit 0
   else
-    /bin/echo "Updating ${appName} to v${currentVers}"
+    printf '%s\n' "Updating ${appName} to v${currentVers}"
   fi
 else
-  /bin/echo "Installing ${appName} v${currentVers}"
+  printf '%s\n' "Installing ${appName} v${currentVers}"
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
   SHAResult=$(printf '%s' "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
   case "${SHAResult}" in
     *OK)
-      /bin/echo "SHA hash has successfully verifed."
+      printf '%s\n' "SHA hash has successfully verifed."
       ;;
 
     *FAILED)
-      /bin/echo "SHA hash has failed verification"
+      printf '%s\n' "SHA hash has failed verification"
       exit 1
       ;;
 
     *)
-      /bin/echo "An unknown error has occured."
+      printf '%s\n' "An unknown error has occured."
       exit 1
       ;;
   esac
-  /usr/sbin/installer -pkg /tmp/"${FILE}" -target /
+  if ! installResult=$(/usr/sbin/installer -pkg /tmp/"${FILE}" -target / 2>&1); then
+    printf '%s\n' "An error occurred installing ${FILE}:"
+    printf '%s\n' "${installResult}"
+  else
+    printf '%s\n' "Successfully installed ${FILE}"
+  fi
   /bin/rm /tmp/"${FILE}"
 fi
