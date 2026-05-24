@@ -5,11 +5,11 @@ bundleName="KeyAccess"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-htmlData=$(/usr/bin/curl -s "https://solutions.teamdynamix.com/TDClient/1965/Portal/KB/ArticleDet?ID=169236")
+htmlData=$(/usr/bin/curl -s "https://solutions.teamdynamix.com/TDClient/1965/Portal/KB/Article/169236/Current-ITAM-Downloads")
 currentVers=$(printf '%s' "${htmlData}" | /usr/bin/tr '>' '\n' | /usr/bin/grep -A1 "Minor Version" | /usr/bin/tail -n 1 | /usr/bin/sed 's/<\/p//' | /usr/bin/xargs)
 downloadURL=$(printf '%s' "${htmlData}" | /usr/bin/tr '>' '\n' | /usr/bin/grep pkg | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - 2>/dev/null)
 FILE=${downloadURL##*/}
-SHAHash=$(printf '%s' "${htmlData}" | /usr/bin/grep -A1 ksp-client.pkg | /usr/bin/xmllint --html --xpath '//span/text()' - 2>/dev/null | /usr/bin/tail -n 1 | /usr/bin/awk '{print $2}')
+SHAHash=$(printf '%s' "${htmlData}" | /usr/bin/grep -A1 ksp-client.pkg | /usr/bin/xmllint --html --xpath 'string(//a[contains(@href,"ksp-client.pkg")]/span[contains(.,"sha256")])' - | /usr/bin/awk '{print $2}')
 
 # compare version numbers
 if [ "${installedVers}" ]; then
