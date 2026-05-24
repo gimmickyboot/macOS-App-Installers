@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.3 (25/05/2026)
+# v1.0.4 (25/05/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -1230,8 +1230,9 @@ for theApp in $theList; do
       ;;
 
     qlab)
-      currentVers=$(/usr/bin/curl -s "https://qlab.app/page-data/download/page-data.json" | "${jqBin}" -r '.result.data.allQlabVersionsYaml.edges[0].node.version')
-      downloadURL="https://qlab.app/downloads/QLab.dmg"
+      xmlData=$(/usr/bin/curl -s "https://qlab.app/appcast/v5/")
+      currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath '//item[1]/title/text()' - | /usr/bin/awk '{print $2}')
+      downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//item[1]/enclosure/@url)' -)
       ;;
 
     r)
