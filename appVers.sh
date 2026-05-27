@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.4 (25/05/2026)
+# v1.0.5 (28/05/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -53,7 +53,7 @@ theFile="/tmp/versions-${todayDate}.txt"
 if [ "$#" -gt 0 ]; then
   theList=$(printf '%s ' "$@")
 else
-  theList="1password adobe_acrobat_reader affinity_designer affinity_photo affinity_publisher alfred altair android_studio api_utility arc artemis atext atom audacity avid_link avid_mediacomposer balenaetcher bbedit blender brave_browser catalyst_browse charles_proxy chatgpt chatgpt_atlas coconut_battery claude codex coderunner cyberduck cycliqplus displaylink_manager dockutil dropbox druva_insync dupeguru elgato_stream_deck endnote evernote fetch figma filemaker_pro firefox firefoxesr freemind fsmonitor gimp github_desktop google_chrome google_earth_pro gpg_suite handbrake handbrakecli imazing_profile_editor insomnia intellij_ultimate isadora itsycal jamf_compliance_editor jamf_connect_configuration jamf_pppc_utility jamf_printer_manager jamf_replicator jamf_sync jamfCheck jamfHelper_constructor joplin jq karabena_elements keepassxc labchart logi_options_plus logi_tune low_profile lulu mafft makemkv managed_app_schema_builder mestrenova microsoft_autoupdater microsoft_companyportal microsoft_edge microsoft_excel microsoft_office_businesspro microsoft_office microsoft_onedrive microsoft_onenote microsoft_outlook microsoft_powerpoint microsoft_quickassist microsoft_remotehelp microsoft_teams2 microsoft_windows_app microsoft_word mist-cli mist mp4joiner mp4splitter mqttexplorer mut mysqlworkbench netbeans nextcloud_desktop nitropdf_pro nextpadplusplus nudge_suite nvivo obs_studio obsidian okta_verify openvpn_connect opera oracle_java8 orion pacifist parallels pgadmin4 plex_media_player plex_media_server plugdata poll_everywhere postman praat proxyman prune pulsar pycharm pymol pymol_lts python3 qlab r raspberry_pi_imager sap_privileges sassafras_keyaccess_mac sequelpro sf_symbols shellcheck signal slack snagit story_architect storyboarder subler sublime_merge sublime_text supportapp suspicous_package swiftdialog teamviewer teamviewerqs telegram theunarchiver thunderbird thunderbirdesr touch_designer transmission utm visual_studio_code vlc voodoopad webex whatsapp wireshark xquartz yubico_authenticator zoom zotero"
+  theList="1password adobe_acrobat_reader affinity_designer affinity_photo affinity_publisher alfred altair android_studio api_utility arc artemis atext atom audacity avid_link avid_mediacomposer balenaetcher bbedit blender brave_browser catalyst_browse charles_proxy chatgpt chatgpt_atlas coconut_battery claude codex coderunner cyberduck cycliqplus displaylink_manager dockutil dropbox druva_insync dupeguru elgato_stream_deck endnote evernote fetch figma filemaker_pro firefox firefoxesr freemind fsmonitor gemini gimp github_desktop google_chrome google_earth_pro gpg_suite handbrake handbrakecli imazing_profile_editor insomnia intellij_ultimate isadora itsycal jamf_compliance_editor jamf_connect_configuration jamf_pppc_utility jamf_printer_manager jamf_replicator jamf_sync jamfCheck jamfHelper_constructor joplin jq karabena_elements keepassxc labchart logi_options_plus logi_tune low_profile lulu mafft makemkv managed_app_schema_builder mestrenova microsoft_autoupdater microsoft_companyportal microsoft_edge microsoft_excel microsoft_office_businesspro microsoft_office microsoft_onedrive microsoft_onenote microsoft_outlook microsoft_powerpoint microsoft_quickassist microsoft_remotehelp microsoft_teams2 microsoft_windows_app microsoft_word mist-cli mist mp4joiner mp4splitter mqttexplorer mut mysqlworkbench netbeans nextcloud_desktop nitropdf_pro nextpadplusplus nudge_suite nvivo obs_studio obsidian okta_verify openvpn_connect opera oracle_java8 orion pacifist parallels pgadmin4 plex_media_player plex_media_server plugdata poll_everywhere postman praat proxyman prune pulsar pycharm pymol pymol_lts python3 qlab r raspberry_pi_imager sap_privileges sassafras_keyaccess_mac sequelpro sf_symbols shellcheck signal slack snagit story_architect storyboarder subler sublime_merge sublime_text supportapp suspicous_package swiftdialog teamviewer teamviewerqs telegram theunarchiver thunderbird thunderbirdesr touch_designer transmission utm visual_studio_code vlc voodoopad webex whatsapp wireshark xquartz yubico_authenticator zoom zotero"
 fi
 
 for theApp in $theList; do
@@ -472,6 +472,12 @@ for theApp in $theList; do
     fsmonitor)
       downloadURL=$(/usr/bin/curl -s "https://fsmonitor.com" | /usr/bin/grep zip | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath '//a/@href' - | /usr/bin/cut -d \" -f 2 -)
       currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/grep -oE 'FSMonitor_[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/FSMonitor_//')
+      ;;
+
+    gemini)
+      jSON=$(/usr/bin/curl -s -X POST "https://update.googleapis.com/service/update2/json" --data-raw '{"request":{"@updater":"GoogleUpdater","domainjoined":true,"protocol":"4.0","dlpref":"cacheable","dedup":"cr","os":{"platform":"MacOSX","version":"26.0.0","arch":"arm64"},"@os":"mac","arch":"arm64","acceptformat":"crx3,download,puff,run,xz,zucc","apps":[{"ap":"m1-prod","enabled":true,"version":"1.00.0.000","updatecheck":{},"appid":"com.google.GeminiMacOS"}]}}' | /usr/bin/tail -c +6)
+      currentVers=$(printf '%s' "${jSON}" | /usr/bin/jq -r '.response.apps[0].updatecheck.nextversion')
+      downloadURL="https://dl.google.com/release2/j33ro/release/Gemini.dmg"
       ;;
 
     gimp)
