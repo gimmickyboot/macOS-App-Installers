@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.5 (28/05/2026)
+# v1.0.6 (11/06/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -66,7 +66,7 @@ for theApp in $theList; do
     adobe_acrobat_reader)
       currentVers=$(/usr/bin/curl -s https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/reader/current_version.txt)
       currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
-      downloadURL="https://ardownload2.adobe.com/pub/adobe/acrobat/mac/AcrobatDC/${currentVersNoDots}/AcroRdrSCADC${currentVersNoDots}_MUI.dmg"
+      downloadURL="https://ardownload3.adobe.com/pub/adobe/acrobat/mac/AcrobatDC/${currentVersNoDots}/AdobeReader${currentVersNoDots}.dmg"
       ;;
 
     affinity_designer)
@@ -505,7 +505,7 @@ for theApp in $theList; do
       ;;
 
     github_desktop)
-      downloadURL=$(/usr/bin/curl -sI "https://central.github.com/deployments/desktop/desktop/latest/darwin" | /usr/bin/grep -i "^location" | /usr/bin/awk '{print $2}' | /usr/bin/tr -d '\r')
+      downloadURL=$(/usr/bin/curl -sI "https://central.github.com/deployments/desktop/desktop/latest/darwin-arm64" | /usr/bin/grep -i "^location" | /usr/bin/awk '{print $2}' | /usr/bin/tr -d '\r')
       currentVers=$(printf '%s' "${downloadURL}" | rev | /usr/bin/cut -d "/" -f 2 - | rev | /usr/bin/awk -F- '{print $1}')
       ;;
 
@@ -1394,13 +1394,14 @@ for theApp in $theList; do
       ;;
 
     teamviewer)
-     downloadURL=$(/usr/bin/curl -s "https://download.teamviewer.com/download/update/macupdates.xml?version=15.1.1&os=macos&osversion=15.5" | /usr/bin/xmllint --xpath '//rss/channel/item/enclosure/@url' - | /usr/bin/grep -v Host | /usr/bin/cut -d \" -f 2 - | /usr/bin/head -n 1)
+      downloadURL=$(/usr/bin/curl -s "https://download.teamviewer.com/download/update/macupdates.xml?version=15.1.1&os=macos&osversion=15.5" | /usr/bin/xmllint --xpath '//rss/channel/item/enclosure/@url' - | /usr/bin/grep -v Host | /usr/bin/cut -d \" -f 2 - | /usr/bin/head -n 1)
       currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/grep -v Host | /usr/bin/cut -d \" -f 2 - | /usr/bin/rev | /usr/bin/cut -d "/" -f 2 - | /usr/bin/rev)
       ;;
 
     teamviewerqs)
-      currentVers=$(/usr/bin/curl -s "https://community.teamviewer.com/English/categories/change-logs-en" | /usr/bin/grep macOS | /usr/bin/xmllint --html --xpath "(//a)[1]/text()" - | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/[a-zA-Z]//g')
-      downloadURL="https://download.teamviewer.com/download/TeamViewerQS.dmg"
+      jSON=$(/usr/bin/curl -s "https://www.teamviewer.com/en-au/solutions/use-cases/quicksupport/" | /usr/bin/grep dmg | /usr/bin/xmllint --html --xpath 'string(//div/@data-json)' - )
+      currentVers=$(printf '%s' "${jSON}" | /usr/bin/jq -r '.data[].versionNumber')
+      downloadURL=$(printf '%s' "${jSON}" | /usr/bin/jq -r '.data[].downloadLink')
       ;;
 
     telegram)
