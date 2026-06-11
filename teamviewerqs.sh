@@ -5,8 +5,14 @@ bundleName="TeamViewerQS"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-currentVers=$(/usr/bin/curl -s "https://community.teamviewer.com/English/categories/change-logs-en" | /usr/bin/grep macOS | /usr/bin/xmllint --html --xpath "(//a)[1]/text()" - | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/[a-zA-Z]//g')
-downloadURL="https://download.teamviewer.com/download/TeamViewerQS.dmg"
+jSON=$(/usr/bin/curl -s "https://www.teamviewer.com/en-au/solutions/use-cases/quicksupport/" | /usr/bin/grep dmg | /usr/bin/xmllint --html --xpath 'string(//div/@data-json)' - )
+if [ "$(/usr/bin/sw_vers -buildVersion | /usr/bin/cut -c 1-2 -)" -ge 24 ]; then
+  currentVers=$(printf '%s' "${jSON}" | /usr/bin/jq -r '.data[].versionNumber')
+  downloadURL=$(printf '%s' "${jSON}" | /usr/bin/jq -r '.data[].downloadLink')
+else
+  currentVers=$(printf '%s' "${jSON}" | /usr/bin/plutil -extract data.0.versionNumber raw -o - -)
+  downloadURL=$(printf '%s' "${jSON}" | /usr/bin/plutil -extract data.0.downloadLink raw -o - -)
+fi
 FILE=${downloadURL##*/}
 
 # compare version numbers

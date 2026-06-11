@@ -7,7 +7,7 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 
 currentVers=$(/usr/bin/curl -s https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/reader/current_version.txt)
 currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
-downloadURL="https://ardownload2.adobe.com/pub/adobe/acrobat/mac/AcrobatDC/${currentVersNoDots}/AcroRdrSCADC${currentVersNoDots}_MUI.dmg"
+downloadURL="https://ardownload3.adobe.com/pub/adobe/acrobat/mac/AcrobatDC/${currentVersNoDots}/AdobeReader${currentVersNoDots}.dmg"
 FILE=${downloadURL##*/}
 
 # compare version numbers

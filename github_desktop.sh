@@ -5,7 +5,21 @@ bundleName="GitHub Desktop"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-downloadURL=$(/usr/bin/curl -sI "https://central.github.com/deployments/desktop/desktop/latest/darwin" | /usr/bin/grep -i "^location" | /usr/bin/awk '{print $2}' | /usr/bin/tr -d '\r')
+case $(uname -m) in
+  arm64)
+    urlAppend="-arm64"
+    ;;
+
+  x86_64)
+    urlAppend=""
+    ;;
+
+  *)
+    printf '%s\n' "Unknown processor type. Exiting"
+    exit 1
+esac
+URL="https://central.github.com/deployments/desktop/desktop/latest/darwin"
+downloadURL=$(curl -sI "${URL}${urlAppend}" | /usr/bin/grep -i "^location" | /usr/bin/awk '{print $2}' | /usr/bin/tr -d '\r')
 FILE=$(printf '%s' "${downloadURL##*/}" | /usr/bin/sed 's/\r//g')
 currentVers=$(printf '%s' "${downloadURL}" | rev | /usr/bin/cut -d "/" -f 2 - | rev | /usr/bin/awk -F- '{print $1}')
 
