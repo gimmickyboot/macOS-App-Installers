@@ -1,14 +1,16 @@
 #!/bin/sh
 
-appInstallPath="/Applications"
-bundleName="Brave Browser"
+appInstallPath="/usr/local/bin"
+bundleName="az"
 appName="${bundleName}"
-installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleVersion 2>/dev/null)
+installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-BBXML=$(/usr/bin/curl -s "https://updates.bravesoftware.com/sparkle/Brave-Browser/stable/appcast.xml")
-currentVers=$(printf '%s' "${BBXML}" | /usr/bin/sed 's/sparkle://g' | /usr/bin/xmllint --xpath '/rss/channel/item[1]/enclosure/@version' - | /usr/bin/awk -F\" '{print $2}')
-downloadURL=$(printf '%s' "${BBXML}" | /usr/bin/xmllint --xpath '//rss/channel/item[1]/enclosure/@url' - | /usr/bin/awk -F\" '{print $2}')
+gitHubURL="https://github.com/Azure/azure-cli"
+latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
+currentVers=$(basename "${latestReleaseURL}" | /usr/bin/tr -d '[:alpha:]' | /usr/bin/sed 's/-//g')
+downloadURL="https://github.com$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/grep "macos-$(uname -m).tar.gz" | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' -)"
 FILE=${downloadURL##*/}
+SHAHash=$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/awk "f&&/sha256:/{print; exit} /${FILE}/{f=1}"| /usr/bin/sed -E 's/.*sha256:([0-9a-fA-F]{64}).*/\1/')
 
 # compare version numbers
 if [ "${installedVers}" ]; then
@@ -36,6 +38,22 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
+  SHAResult=$(printf '%s' "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  case "${SHAResult}" in
+    *OK)
+      printf '%s\n' "SHA hash has successfully verifed."
+      ;;
+
+    *FAILED)
+      printf '%s\n' "SHA hash has failed verification"
+      exit 1
+      ;;
+
+    *)
+      printf '%s\n' "An unknown error has occured."
+      exit 1
+      ;;
+  esac
   /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
   TMPDIR=$(mktemp -d)
   /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
