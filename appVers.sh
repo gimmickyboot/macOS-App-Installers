@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.7 (12/06/2026)
+# v1.0.8 (22/06/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -262,27 +262,9 @@ for theApp in $theList; do
       ;;
 
     brave_browser)
-      if [ "${platformType}" = "Linux" ]; then
-        URLpath="stable-arm64"
-      else
-        case "$(uname -m)" in
-          arm64)
-            URLpath="stable-arm64"
-            ;;
-
-          x86_64)
-            URLpath="stable"
-            ;;
-
-          *)
-            /bin/echo "Unknown processor architecture. Exiting"
-            exit 1
-            ;;
-        esac
-      fi
-      BBXML=$(/usr/bin/curl -s "https://updates.bravesoftware.com/sparkle/Brave-Browser/${URLpath}/appcast.xml")
-      currentVers=$(printf '%s' "${BBXML}" | /usr/bin/sed 's/sparkle://g' | /usr/bin/xmllint --xpath '/rss/channel/item[last()]/enclosure/@version' - | /usr/bin/awk -F\" '{print $2}')
-      downloadURL=$(printf '%s' "${BBXML}" | /usr/bin/xmllint --xpath '//rss/channel/item[last()]/enclosure/@url' - | /usr/bin/awk -F\" '{print $2}')
+      BBXML=$(/usr/bin/curl -s "https://updates.bravesoftware.com/sparkle/Brave-Browser/stable/appcast.xml")
+      currentVers=$(printf '%s' "${BBXML}" | /usr/bin/sed 's/sparkle://g' | /usr/bin/xmllint --xpath '/rss/channel/item[1]/enclosure/@version' - | /usr/bin/awk -F\" '{print $2}')
+      downloadURL=$(printf '%s' "${BBXML}" | /usr/bin/xmllint --xpath '//rss/channel/item[1]/enclosure/@url' - | /usr/bin/awk -F\" '{print $2}')
       ;;
 
     catalyst_browse)
