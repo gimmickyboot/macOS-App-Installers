@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.8 (22/06/2026)
+# v1.0.9 (01/07/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -452,8 +452,9 @@ for theApp in $theList; do
       ;;
 
     fsmonitor)
-      downloadURL=$(/usr/bin/curl -s "https://fsmonitor.com" | /usr/bin/grep zip | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath '//a/@href' - | /usr/bin/cut -d \" -f 2 -)
-      currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/grep -oE 'FSMonitor_[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/FSMonitor_//')
+      XML=$(/usr/bin/curl -s "https://fsmonitor.com/FSMonitor/Archives/appcast2.xml")
+      currentVers=$(printf '%s' "${XML}" | /usr/bin/xmllint --xpath '//rss/channel/item[1]/enclosure/@*[local-name()="shortVersionString"]' - | /usr/bin/awk -F \" '{print $2}')
+      downloadURL=$(printf '%s' "${XML}" | /usr/bin/xmllint --xpath '//rss/channel/item[1]/enclosure/@url' - | /usr/bin/cut -d \" -f 2 -)
       ;;
 
     gemini)
