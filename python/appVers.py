@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+appVers - a python appVers version scraper
+
+Author: Mac Guy <https://github.com/gimmickyboot/macOS-App-Installers>
+Licence: MIT
+"""
+
+__version__ = "1.0.0"
+
 
 from __future__ import annotations
 
