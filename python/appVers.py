@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
+from __future__ import annotations
+
 """
 appVers - a python appVers version scraper
 
@@ -9,8 +12,6 @@ Licence: MIT
 
 __version__ = "1.0.0"
 
-
-from __future__ import annotations
 
 from typing import List
 
