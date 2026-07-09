@@ -43,6 +43,12 @@ parser.add_argument("-q", "--quiet",
 
 # ---- runner ----
 def run_all(apps: List[App], email: bool = False, quiet: bool = False) -> List[Result]:
+    configured_count = len(apps)
+    attempted_count = 0
+    success_count = 0
+    failure_count = 0
+    errors = []
+
     results: List[Result] = []
 
     with requests.Session() as session:
@@ -51,18 +57,45 @@ def run_all(apps: List[App], email: bool = False, quiet: bool = False) -> List[R
         })
 
         for app in apps:
+            attempted_count += 1
+
             try:
                 res = app.scraper(session, app)
                 results.append(res)
+                success_count += 1
+
                 if not quiet:
                     print(f"{res.name}: {res.version} -> {res.download_url}", flush=True,)
 
             except Exception as e:
                 # In your real script, log the exception + continue
-                print(f"[ERROR] {app.name}: {e}", file=sys.stderr)
+                failure_count += 1
+                errors.append(f"{app.name}: {e}")
+                print(f"[ERROR] {app.name}: {e}", file=sys.stderr, flush=True)
 
-    if email and results:
-        send_email(results)
+    summary = (
+        f"Configured scrapers: {configured_count}\n"
+        f"Attempted scrapers: {attempted_count}\n"
+        f"Successful scrapers: {success_count}\n"
+        f"Failed scrapers: {failure_count}\n"
+    )
+
+    if errors:
+        summary += "\n\nFailures:\n"
+        summary += "\n".join(errors)
+
+    if email:
+        # send_email(results)
+        body = "\n".join(
+            f"{r.name}: {r.version} -> {r.download_url}"
+            for r in results
+        )
+
+        body += "\n\n" + summary
+        send_email(body)
+
+    if not quiet:
+        print("\n" + summary, flush=True)
 
     return results
 

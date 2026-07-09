@@ -116,11 +116,12 @@ def validate_download_url(
         return "ERROR"
 
 
-def send_email(results: list[Result]) -> None:
-    body = "\n".join(
-        f"{r.name}: {r.version} -> {r.download_url}"
-        for r in results
-    )
+# def send_email(results: list[Result]) -> None:
+def send_email(body: str) -> None:
+    # body = "\n".join(
+    #     f"{r.name}: {r.version} -> {r.download_url}"
+    #     for r in results
+    # )
 
     msg = EmailMessage()
     msg["Subject"] = "AppVers email"
