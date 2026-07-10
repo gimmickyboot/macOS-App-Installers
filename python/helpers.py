@@ -13,12 +13,11 @@ import requests
 import yaml
 from bs4 import BeautifulSoup
 
-from models import Result
 import config as cfg
 
 
-def get_text(url: str, session: requests.Session, timeout: int = cfg.HTTP_TIMEOUT) -> str:
-    r = session.get(url, timeout=timeout, allow_redirects=True)
+def get_text(url: str, session: requests.Session, timeout: int = cfg.HTTP_TIMEOUT, headers: dict | None = None) -> str:
+    r = session.get(url, timeout=timeout, allow_redirects=True, headers=headers)
     r.raise_for_status()
     return r.text
 

@@ -496,7 +496,10 @@ def scrape_mysqlworkbench(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
+    if app.useragent:
+        header = {"User-Agent": app.useragent}
+
+    html = get_text(app.app_url, session, headers=header)
 
     soup = BeautifulSoup(html, "html.parser")
 
@@ -507,7 +510,7 @@ def scrape_mysqlworkbench(session: requests.Session, app: App) -> Result:
 
     download_url_raw = get_href_link(soup, "-macos-arm64.dmg")
     download_url_tmp = download_url_raw.split('=')[1].split('&')[0]
-    download_url = f"https://cdn.mysql.com//Downloads/MySQLGUITools/{download_url_tmp}"
+    download_url = f"https://cdn.mysql.com/Downloads/MySQLGUITools/{download_url_tmp}"
     if not download_url:
         raise ValueError("Could not determine download URL")
 

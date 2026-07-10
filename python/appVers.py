@@ -65,7 +65,7 @@ def run_all(apps: List[App], email: bool = False, quiet: bool = False) -> List[R
                 success_count += 1
 
                 if not quiet:
-                    print(f"{res.name}: {res.version} -> {res.download_url}", flush=True,)
+                    print(f"{res.name}: {res.version} -> {res.download_url}\n", flush=True,)
 
             except Exception as e:
                 # In your real script, log the exception + continue
@@ -87,7 +87,7 @@ def run_all(apps: List[App], email: bool = False, quiet: bool = False) -> List[R
     if email:
         # send_email(results)
         body = "\n".join(
-            f"{r.name}: {r.version} -> {r.download_url}"
+            f"{r.name}: {r.version} -> {r.download_url}\n"
             for r in results
         )
 

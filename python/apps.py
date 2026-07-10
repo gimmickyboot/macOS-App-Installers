@@ -190,7 +190,7 @@ apps = [
     App(name="MP4Splitter", app_url="https://www.mp4joiner.org/en", download_url_template="https://ixpeering.dl.sourceforge.net/project/mp4joiner/MP4Tools/{version}/MP4Tools-{version}-MacOSX.dmg", scraper=scrape_mp4joiner),
     App(name="MQTT Explorer", app_url="https://github.com/thomasnordquist/MQTT-Explorer", file_search_strings=["mac.zip"], scraper=scrape_github),
     App(name="MUT", app_url="https://github.com/jamf/mut", file_search_strings=[".zip"], scraper=scrape_github),
-    App(name="MySQLWorkbench", app_url="https://dev.mysql.com/downloads/workbench/?os=33", scraper=scrape_mysqlworkbench),
+    App(name="MySQLWorkbench", app_url="https://dev.mysql.com/downloads/workbench/?os=33", useragent="curl/8.7.1", scraper=scrape_mysqlworkbench),
     App(name="Apache NetBeans", app_url="https://github.com/Friends-of-Apache-NetBeans/netbeans-installers", file_search_strings=[".pkg"], scraper=scrape_github),
     App(name="Nextcloud", app_url="https://github.com/nextcloud-releases/desktop", file_search_strings=[".pkg"], scraper=scrape_github),
     App(name="Nextpad++", app_url="https://github.com/nextpad-plus-plus/nextpad-plus-plus-macos", file_search_strings=[".dmg"], scraper=scrape_github),
