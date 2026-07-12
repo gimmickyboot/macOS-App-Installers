@@ -254,7 +254,7 @@ apps = [
     App(name="Visual Studio Code", app_url="https://update.code.visualstudio.com/api/update/darwin-universal/stable/dc96b837cf6bb4af9cd736aa3af08cf8279f7685", scraper=scrape_visualstudiocode),
     App(name="VLC", app_url="https://www.videolan.org/vlc/download-macosx.html", scraper=scrape_vlc),
     App(name="Voodoo Pad", app_url="https://www.voodoopad.com/", download_url_template="https://voodoopad.s3.amazonaws.com/VoodooPad-{version}.zip", scraper=scrape_voodoopad),
-    App(name="Webex", app_url="https://help.webex.com/en-us/article/mqkve8/Webex-App-%7C-Release-notes", download_url="https://www.webex.com/downloads.html", scraper=scrape_webex),
+    App(name="Webex", app_url="https://help.webex.com/en-us/article/mqkve8/Webex-App-%7C-Release-notes", useragent="curl/8.7.1", download_url="https://www.webex.com/downloads.html", scraper=scrape_webex),
     App(name="WhatsApp", download_url="https://web.whatsapp.com/desktop/mac_native/release/?configuration=Release", scraper=scrape_whatsapp),
     App(name="Wireshark", app_url="https://www.wireshark.org/update/0/Wireshark/3.6.3/macOS/x86-64/en-US/stable.xml", scraper=scrape_wireshark),
     App(name="XQuartz", app_url="https://github.com/xquartz/xquartz", file_search_strings=[".pkg"], scraper=scrape_github),
