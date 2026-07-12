@@ -10,7 +10,7 @@ Author: Mac Guy <https://github.com/gimmickyboot/macOS-App-Installers>
 Licence: MIT
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 
 from typing import List
