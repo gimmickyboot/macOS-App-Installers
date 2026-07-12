@@ -1,6 +1,7 @@
 from typing import Any
 from email.message import EmailMessage
 from urllib.parse import urlparse
+from datetime import date
 
 import plistlib
 import posixpath
@@ -117,13 +118,14 @@ def validate_download_url(
 
 # def send_email(results: list[Result]) -> None:
 def send_email(body: str) -> None:
+    today = date.today().isoformat()
     # body = "\n".join(
     #     f"{r.name}: {r.version} -> {r.download_url}"
     #     for r in results
     # )
 
     msg = EmailMessage()
-    msg["Subject"] = "AppVers email"
+    msg["Subject"] = f"App versions for {today}"
     msg["From"] = cfg.FROM_EMAIL
     msg["To"] = cfg.TO_EMAIL
     msg.set_content(body)
