@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.9 (01/07/2026)
+# v1.0.10 (13/07/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -284,7 +284,7 @@ for theApp in $theList; do
       ;;
 
     chatgpt)
-      xmlData=$(/usr/bin/curl -s https://persistent.oaistatic.com/sidekick/public/sparkle_public_appcast.xml)
+      xmlData=$(/usr/bin/curl -s https://persistent.oaistatic.com/codex-app-prod/appcast.xml)
       currentVers=$(echo "${xmlData}" | xmllint --xpath '//rss/channel/item/title/text()' - | /usr/bin/head -n 1)
       downloadURL=$(echo "${xmlData}" | xmllint --xpath '//rss/channel/item/enclosure/@url' - | /usr/bin/head -n 1 | /usr/bin/cut -d \" -f 2 - -)
       ;;
