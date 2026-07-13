@@ -2175,7 +2175,10 @@ def scrape_webex(session: requests.Session, app: App) -> Result:
     else:
         download_url = app.download_url
 
-    html = get_text(app.app_url, session)
+    if app.useragent:
+        header = {"User-Agent": app.useragent}
+
+    html = get_text(app.app_url, session, headers=header)
 
     soup = BeautifulSoup(html, "html.parser")
 

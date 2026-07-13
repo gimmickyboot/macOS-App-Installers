@@ -113,7 +113,7 @@ apps = [
     App(name="Catalyst Browse", app_url="https://cs.d-imaging.sony.co.jp/coay5hz6MI/2Aext1Frsi?product=CatalystBrowse&lang=en", download_url="https://di.update.sony.net/NEX/ch4055c566/Catalyst_Browse.dmg", scraper=scrape_catalystbrowse),
     App(name="Charles Proxy", app_url="https://www.charlesproxy.com/download/latest-release", download_url_template="https://www.charlesproxy.com/assets/release/{version}/charles-proxy-{version}.dmg", scraper=scrape_charlesproxy),
     App(name="ChatGPT Atlas", app_url="https://persistent.oaistatic.com/atlas/public/sparkle_public_appcast.xml", scraper=scrape_openai),
-    App(name="ChatGPT", app_url="https://persistent.oaistatic.com/sidekick/public/sparkle_public_appcast.xml", scraper=scrape_openai),
+    App(name="ChatGPT aka Codex", app_url="https://persistent.oaistatic.com/codex-app-prod/appcast.xml", scraper=scrape_openai),
     App(name="Claude", app_url="https://downloads.claude.ai/releases/darwin/universal/RELEASES.json", scraper=scrape_claude),
     App(name="coconutBattery", app_url="https://www.coconut-flavour.com/coconutbattery", scraper=scrape_coconutbattery),
     App(name="CodeRunner", app_url="https://coderunnerapp.com/appcast.xml", sparkle_version_key="shortVersionString", scraper=scrape_sparkle),
