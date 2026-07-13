@@ -10,7 +10,7 @@ Author: Mac Guy <https://github.com/gimmickyboot/macOS-App-Installers>
 Licence: MIT
 """
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 
 from typing import List
@@ -28,17 +28,35 @@ import config as cfg
 # set up cli args
 parser = argparse.ArgumentParser(
     description="Application version scraper, "
-                "with optional email sending. "
+    "with optional email sending. "
                 "Refer to https://github.com/gimmickyboot/macOS-App-Installers"
 )
-parser.add_argument("-e", "--email",
-                    action="store_true",
-                    help="Send results as email."
-                    )
-parser.add_argument("-q", "--quiet",
-                    action="store_true",
-                    help="supress output to stdout"
-                    )
+parser.add_argument(
+    "-e",
+    "--email",
+    action="store_true",
+    help="Send results as email."
+)
+parser.add_argument(
+    "-q",
+    "--quiet",
+    action="store_true",
+    help="supress output to stdout"
+)
+group = parser.add_mutually_exclusive_group()
+group.add_argument(
+    "-l",
+    "--list",
+    action="store_true",
+    help="list all available apps"
+)
+group.add_argument(
+    "-a",
+    "--app",
+    action="append",
+    metavar="NAME",
+    help="Run only the specified apps matching name(s). May be specified multiple times"
+)
 
 
 # ---- runner ----
@@ -103,7 +121,30 @@ def run_all(apps: List[App], email: bool = False, quiet: bool = False) -> List[R
 def main() -> int:
     args = parser.parse_args()
 
-    run_all(apps, email=args.email, quiet=args.quiet)
+    selected_apps = apps
+    if args.app:
+        requested = {name.casefold() for name in args.app}
+        selected_apps = [
+            app
+            for app in apps
+            if app.name.casefold() in requested
+        ]
+
+        found = {app.name.casefold() for app in selected_apps}
+        missing = requested - found
+
+        if missing:
+            print("The following app(s) weren't found:", file=sys.stderr)
+            for name in sorted(missing):
+                print(f"    {name}", file=sys.stderr)
+            return 1
+
+    if args.list:
+        for app in sorted(apps, key=lambda app: app.name.casefold()):
+            print(app.name)
+        return 0
+
+    run_all(selected_apps, email=args.email, quiet=args.quiet)
 
     return 0
 
