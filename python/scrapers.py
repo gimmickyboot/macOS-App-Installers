@@ -34,11 +34,14 @@ def scrape_sparkle(session: requests.Session, app: App) -> Result:
 
     xml = get_xml(app.app_url, session)
 
-    item = xml.find(".//channel/item")
-    if item is None:
+    items = xml.findall(".//channel/item")
+
+    if items is None:
         raise ValueError("Could not find Sparkle item")
 
-    enclosure = xml.find('.//channel/item/enclosure')
+    item = items[-1] if app.sparkle_latest_last else items[0]
+
+    enclosure = item.find('enclosure')
     if enclosure is None:
         raise ValueError("Could not find enclosure")
 
@@ -2331,51 +2334,6 @@ def scrape_zoom(session: requests.Session, app: App) -> Result:
         raise ValueError("Could not find version")
 
     download_url = app.download_url
-
-    return Result(
-        name=app.name,
-        version=version,
-        download_url=validate_download_url(download_url, session)
-    )
-
-
-def scrape_orion(session: requests.Session, app: App) -> Result:
-    if not app.app_url:
-        raise ValueError("app_url is required")
-
-    if not app.sparkle_version_key:
-        raise ValueError("sparkle_version_key is required")
-
-    xml = get_xml(app.app_url, session)
-
-    items = xml.findall(".//channel/item")
-
-    if items is None:
-        raise ValueError("Could not find Sparkle item")
-
-    last_item = items[-1]
-    enclosure = last_item.find('enclosure')
-    if enclosure is None:
-        raise ValueError("Could not find enclosure")
-
-    ns = {
-        'sparkle': 'http://www.andymatuschak.org/xml-namespaces/sparkle'
-    }
-
-    sparkle_ns = ns['sparkle']
-    version_raw = f"{{{sparkle_ns}}}{app.sparkle_version_key}"
-    version = enclosure.get(version_raw)
-    if not version:
-        version = last_item.findtext(f"sparkle:{app.sparkle_version_key}", namespaces=ns)
-    else:
-        version = enclosure.get(version_raw).split(" ")[0]
-
-    if not version:
-        raise ValueError("Could not determine version")
-
-    download_url = enclosure.get('url')
-    if not download_url:
-        raise ValueError("Could not determine download URL")
 
     return Result(
         name=app.name,
