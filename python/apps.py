@@ -85,8 +85,7 @@ from scrapers import (
     scrape_whatsapp,
     scrape_yubicoauth,
     scrape_zotero,
-    scrape_zoom,
-    scrape_orion
+    scrape_zoom
 )
 
 apps = [
