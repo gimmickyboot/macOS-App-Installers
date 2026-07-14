@@ -43,14 +43,13 @@ parser.add_argument(
     action="store_true",
     help="supress output to stdout"
 )
-group = parser.add_mutually_exclusive_group()
-group.add_argument(
+parser.add_argument(
     "-l",
     "--list",
     action="store_true",
     help="list all available apps"
 )
-group.add_argument(
+parser.add_argument(
     "-a",
     "--app",
     action="append",
@@ -120,6 +119,9 @@ def run_all(apps: List[App], email: bool = False, quiet: bool = False) -> List[R
 
 def main() -> int:
     args = parser.parse_args()
+
+    if args.list and (args.app or args.email):
+        parser.error("-l/--list cannot be used with -a/--app or -e/--email")
 
     selected_apps = apps
     if args.app:

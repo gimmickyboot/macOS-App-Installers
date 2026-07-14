@@ -23,6 +23,39 @@ def get_text(url: str, session: requests.Session, timeout: int = cfg.HTTP_TIMEOU
     return r.text
 
 
+def get_text_with_curl(url: str, timeout: int = cfg.HTTP_TIMEOUT, headers: dict[str, str] | None = None) -> str:
+    command = [
+        "curl",
+        "-fsSL",
+        "--max-time",
+        str(cfg.HTTP_TIMEOUT)
+    ]
+
+    if headers:
+        for name, value in headers.items():
+            command.extend([
+                "-H",
+                f"{name}: {value}"
+            ])
+
+    command.append(url)
+
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+    except subprocess.CalledProcessError as e:
+        error = e.stderr.strip() or "Unkown curl error"
+        raise RuntimeError(
+            f"curl failed for {url}: {error}"
+        ) from e
+
+    return result.stdout
+
+
 def get_json(url: str, session: requests.Session, timeout: int = cfg.HTTP_TIMEOUT) -> Any:
     r = session.get(url, timeout=timeout, allow_redirects=True)
     r.raise_for_status()
