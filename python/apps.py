@@ -203,7 +203,7 @@ apps = [
     App(name="OpenVPN Connect", download_url="https://openvpn.net/downloads/openvpn-connect-v3-macos.dmg", scraper=scrape_openvpnconnect),
     App(name="Opera", app_url="https://download.opera.com/download/get/?partner=www&opsys=MacOS", scraper=scrape_opera),
     App(name="Oracle Java 8", app_url="https://javadl-esd-secure.oracle.com/update/mac/map-mac-aarch64-1.8.0.xml", scraper=scrape_oraclejava8),
-    App(name="Orion", app_url="https://cdn.kagi.com/updates/26_0/appcast.xml", sparkle_version_key="version", scraper=scrape_sparkle),
+    App(name="Orion", app_url="https://cdn.kagi.com/updates/26_0/appcast.xml", sparkle_version_key="shortVersionString", sparkle_latest_last=True, scraper=scrape_sparkle),
     App(name="Pacifist", app_url="https://www.charlessoft.com/cgi-bin/pacifist_sparkle.cgi", scraper=scrape_pacifist),
     App(name="Parallels", app_url="https://parallels.com/directdownload/pd", scraper=scrape_parallels),
     App(name="pgAdmin 4", app_url="https://pgadmin-archive.postgresql.org/pgadmin4/index.html", download_url_template="https://pgadmin-archive.postgresql.org/pgadmin4/v{version}/macos/pgadmin4-{version}-arm64.dmg", scraper=scrape_pgadmin4),

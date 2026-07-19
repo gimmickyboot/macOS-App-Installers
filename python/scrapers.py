@@ -10,6 +10,7 @@ import requests
 from models import App, Result
 from helpers import (
     get_text,
+    get_text_with_curl,
     get_json,
     get_xml,
     get_plist,
@@ -33,11 +34,14 @@ def scrape_sparkle(session: requests.Session, app: App) -> Result:
 
     xml = get_xml(app.app_url, session)
 
-    item = xml.find(".//channel/item")
-    if item is None:
+    items = xml.findall(".//channel/item")
+
+    if items is None:
         raise ValueError("Could not find Sparkle item")
 
-    enclosure = xml.find('.//channel/item/enclosure')
+    item = items[-1] if app.sparkle_latest_last else items[0]
+
+    enclosure = item.find('enclosure')
     if enclosure is None:
         raise ValueError("Could not find enclosure")
 
@@ -47,10 +51,11 @@ def scrape_sparkle(session: requests.Session, app: App) -> Result:
 
     sparkle_ns = ns['sparkle']
     version_raw = f"{{{sparkle_ns}}}{app.sparkle_version_key}"
-
     version = enclosure.get(version_raw)
     if not version:
         version = item.findtext(f"sparkle:{app.sparkle_version_key}", namespaces=ns)
+    else:
+        version = enclosure.get(version_raw).split(" ")[0]
 
     if not version:
         raise ValueError("Could not determine version")
@@ -498,6 +503,8 @@ def scrape_mysqlworkbench(session: requests.Session, app: App) -> Result:
 
     if app.useragent:
         header = {"User-Agent": app.useragent}
+    else:
+        header = {"User-Agent": cfg.USER_AGENT}
 
     html = get_text(app.app_url, session, headers=header)
 
@@ -2177,8 +2184,15 @@ def scrape_webex(session: requests.Session, app: App) -> Result:
 
     if app.useragent:
         header = {"User-Agent": app.useragent}
+    else:
+        header = {"User-Agent": cfg.USER_AGENT}
 
-    html = get_text(app.app_url, session, headers=header)
+    try:
+        html = get_text(app.app_url, session, headers=header)
+    except requests.RequestException as exc:
+        raise RuntimeError(
+            f"Webex release page failed: {app.app_url}: {exc}"
+        ) from exc
 
     soup = BeautifulSoup(html, "html.parser")
 
@@ -2187,9 +2201,12 @@ def scrape_webex(session: requests.Session, app: App) -> Result:
     if not version:
         raise ValueError("Could not find version")
 
-    clean_session = requests.Session()
-    clean_session.cookies.update(session.cookies)
-    html = get_text(app.download_url, clean_session)
+    try:
+        html = get_text(app.download_url, session, headers=header)
+    except requests.HTTPError as e:
+        if e.response is None or e.response.status_code != 403:
+            raise
+        html = get_text_with_curl(app.download_url, headers=header)
 
     soup = BeautifulSoup(html, "html.parser")
 

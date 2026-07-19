@@ -5,15 +5,15 @@ bundleName="RStudio"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleLongVersionString 2>/dev/null | /usr/bin/sed 's/+/-/g')
 
-FILE=$(/usr/bin/curl -s "https://posit.co/download/rstudio-desktop/" | /usr/bin/sed 's/<[^>]*>//g' | /usr/bin/grep dmg | /usr/bin/sed 's/ //g')
-currentVers=$(printf '%s' "${FILE}" | /usr/bin/sed -e 's/RStudio-//' -e 's/.dmg//')
-downloadURL="https://download1.rstudio.org/electron/macos/${FILE}"
+downloadURL=$(/usr/bin/curl -s "https://docs.posit.co/ide/user/#rstudio-ide-oss-downloads" | grep dmg | head -n 1 | xmllint --html --xpath 'string(//a/@href)' -)
+currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/sed -e 's|.*/RStudio-\(.*\)\.dmg|\1|' -e 's/-/+/')
+FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   /bin/echo "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed -e 's/\.//g' -e 's/+//')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed -e 's/\.//g' -e 's/+//')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}

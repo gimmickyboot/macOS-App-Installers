@@ -19,6 +19,7 @@ class App:
     download_url: Optional[str] = None
     download_url_template: Optional[str] = None
     sparkle_version_key: Optional[str] = None
+    sparkle_latest_last: bool = False
     json_search_string: Optional[str] = None
     useragent: Optional[str] = None
     file_search_strings: list[str] = field(default_factory=list)
