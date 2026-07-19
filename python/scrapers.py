@@ -2114,7 +2114,7 @@ def scrape_vlc(session: requests.Session, app: App) -> Result:
     tag = soup.find('a', string="VLC for Mac (Universal Binary)")
     download_url_raw = tag.get('href')
 
-    download_url = f"https:{download_url_raw}"
+    download_url = get_redirect_url_curl(f"https:{download_url_raw}")
 
     return Result(
         name=app.name,
@@ -2334,6 +2334,33 @@ def scrape_zoom(session: requests.Session, app: App) -> Result:
         raise ValueError("Could not find version")
 
     download_url = app.download_url
+
+    return Result(
+        name=app.name,
+        version=version,
+        download_url=validate_download_url(download_url, session)
+    )
+
+
+def scrape_rstudio(session: requests.Session, app: App) -> Result:
+    if not app.app_url:
+        raise ValueError("app_url is required")
+
+    html = get_text(app.app_url, session)
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    links = soup.find_all('a', href=True)
+    for link in links:
+        if ".dmg" in link['href']:
+            download_url = link['href']
+            break
+
+    if not download_url:
+        raise ValueError("Could not determine download URL")
+
+    file_name = filename_from_url(download_url)
+    version = re.search(r"-(.*?)\.dmg", file_name).group(1)
 
     return Result(
         name=app.name,

@@ -85,7 +85,8 @@ from scrapers import (
     scrape_whatsapp,
     scrape_yubicoauth,
     scrape_zotero,
-    scrape_zoom
+    scrape_zoom,
+    scrape_rstudio
 )
 
 apps = [
@@ -261,5 +262,7 @@ apps = [
     App(name="Yubico Authenticator", download_url="https://developers.yubico.com/yubioath-flutter/Releases/yubico-authenticator-latest-mac.dmg", scraper=scrape_yubicoauth),
     App(name="Zoom", app_url="https://zoom.us/rest/download?os=mac", download_url="https://zoom.us/client/latest/ZoomInstallerIT.pkg", scraper=scrape_zoom),
     App(name="Zotero", app_url="https://www.zotero.org/download/", scraper=scrape_zotero),
-    App(name="MestReNova", app_url="https://mestrelab.com", scraper=scrape_mestrenova)
+    App(name="MestReNova", app_url="https://mestrelab.com", scraper=scrape_mestrenova),
+    App(name="RStudio", app_url="https://docs.posit.co/ide/user/#rstudio-ide-oss-downloads", scraper=scrape_rstudio),
+    App(name="Orchard View", app_url="https://github.com/Jamf-Concepts/orchard-view", scraper=scrape_github)
 ]
