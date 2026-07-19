@@ -1,14 +1,14 @@
 #!/bin/sh
 
 appInstallPath="/Applications"
-bundleName="PPPC Utility"
+bundleName="Orchard View"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-gitHubURL="https://github.com/jamf/PPPC-Utility"
+gitHubURL="https://github.com/Jamf-Concepts/orchard-view"
 latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
-currentVers=$(basename "${latestReleaseURL}")
-downloadURL="https://github.com$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/grep zip | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' -)"
+currentVers=$(basename "${latestReleaseURL}" | /usr/bin/sed 's/v//')
+downloadURL="https://github.com$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/grep pkg | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' -)"
 SHAHash=$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/awk "f&&/sha256:/{print; exit} /${FILE}/{f=1}"| /usr/bin/sed -E 's/.*sha256:([0-9a-fA-F]{64}).*/\1/')
 FILE=${downloadURL##*/}
 
@@ -38,6 +38,22 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
+  SHAResult=$(printf '%s' "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  case "${SHAResult}" in
+    *OK)
+      printf '%s\n' "SHA hash has successfully verifed."
+      ;;
+
+    *FAILED)
+      printf '%s\n' "SHA hash has failed verification"
+      exit 1
+      ;;
+
+    *)
+      printf '%s\n' "An unknown error has occured."
+      exit 1
+      ;;
+  esac
   /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
   /usr/bin/ditto -xk /tmp/"${FILE}" "${appInstallPath}"/.
   /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
