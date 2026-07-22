@@ -1,30 +1,13 @@
 #!/bin/sh
 
 appInstallPath="/Applications"
-bundleName="ChatGPT Classic"
+bundleName="BetterZip"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-case $(uname -m) in
-  arm64)
-    printf '%s\n' "Apple Silicon detected. Continuing..."
-    ;;
-
-  x86_64)
-    printf '%s\n' "Intel detected. Can not continue.
-App requires Apple Silicon."
-    exit 1
-    ;;
-
-  *)
-    printf '%s\n' "Unknown processor architecture. Exiting"
-    exit 1
-    ;;
-esac
-
-xmlData=$(/usr/bin/curl -s https://persistent.oaistatic.com/sidekick/public/sparkle_public_appcast.xml)
-currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath '//rss/channel/item/title/text()' - | /usr/bin/head -n 1)
-downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath '//rss/channel/item/enclosure/@url' - | /usr/bin/head -n 1 | /usr/bin/cut -d \" -f 2 - -)
+xmlData=$(/usr/bin/curl -s https://macitbetter.com/BetterZip6.rss)
+currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//rss/channel/item/enclosure/@*[name()="sparkle:shortVersionString"])' -)
+downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//rss/channel/item[1]/enclosure/@url)' -)
 FILE=${downloadURL##*/}
 
 # compare version numbers
