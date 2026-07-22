@@ -713,29 +713,6 @@ def scrape_r(session: requests.Session, app: App) -> Result:
     )
 
 
-def scrape_openai(session: requests.Session, app: App) -> Result:
-    if not app.app_url:
-        raise ValueError("app_url is required")
-
-    xml_data = get_xml(app.app_url, session)
-
-    item = xml_data.find('./channel/item')
-    enclosure = item.find('enclosure')
-    version = item.find('title').text
-    if not version:
-        raise ValueError("Could not determine version")
-
-    download_url = enclosure.get('url')
-    if not download_url:
-        raise ValueError("Could not determine download URL")
-
-    return Result(
-        name=app.name,
-        version=version,
-        download_url=validate_download_url(download_url, session)
-    )
-
-
 def scrape_codex(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")

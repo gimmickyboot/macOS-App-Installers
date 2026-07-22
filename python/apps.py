@@ -21,7 +21,6 @@ from scrapers import (
     scrape_gpgtools,
     scrape_python,
     scrape_r,
-    scrape_openai,
     scrape_gimp,
     scrape_codex,
     scrape_imazingprofileeditor,
@@ -113,9 +112,9 @@ apps = [
     App(name="Brave Browser", app_url="https://updates.bravesoftware.com/sparkle/Brave-Browser/stable/appcast.xml", sparkle_version_key="version", scraper=scrape_sparkle),
     App(name="Catalyst Browse", app_url="https://cs.d-imaging.sony.co.jp/coay5hz6MI/2Aext1Frsi?product=CatalystBrowse&lang=en", download_url="https://di.update.sony.net/NEX/ch4055c566/Catalyst_Browse.dmg", scraper=scrape_catalystbrowse),
     App(name="Charles Proxy", app_url="https://www.charlesproxy.com/download/latest-release", download_url_template="https://www.charlesproxy.com/assets/release/{version}/charles-proxy-{version}.dmg", scraper=scrape_charlesproxy),
-    App(name="ChatGPT Atlas", app_url="https://persistent.oaistatic.com/atlas/public/sparkle_public_appcast.xml", scraper=scrape_openai),
-    App(name="ChatGPT", app_url="https://persistent.oaistatic.com/codex-app-prod/appcast.xml", scraper=scrape_openai),
-    App(name="ChatGPT Classic", app_url="https://persistent.oaistatic.com/sidekick/public/sparkle_public_appcast.xml", scraper=scrape_openai),
+    App(name="ChatGPT Atlas", app_url="https://persistent.oaistatic.com/atlas/public/sparkle_public_appcast.xml", sparkle_version_key="shortVersionString", scraper=scrape_sparkle),
+    App(name="ChatGPT", app_url="https://persistent.oaistatic.com/codex-app-prod/appcast.xml", sparkle_version_key="shortVersionString", scraper=scrape_sparkle),
+    App(name="ChatGPT Classic", app_url="https://persistent.oaistatic.com/sidekick/public/sparkle_public_appcast.xml", sparkle_version_key="shortVersionString", scraper=scrape_sparkle),
     App(name="Claude", app_url="https://downloads.claude.ai/releases/darwin/universal/RELEASES.json", scraper=scrape_claude),
     App(name="coconutBattery", app_url="https://www.coconut-flavour.com/coconutbattery", scraper=scrape_coconutbattery),
     App(name="CodeRunner", app_url="https://coderunnerapp.com/appcast.xml", sparkle_version_key="shortVersionString", scraper=scrape_sparkle),
@@ -265,5 +264,6 @@ apps = [
     App(name="Zotero", app_url="https://www.zotero.org/download/", scraper=scrape_zotero),
     App(name="MestReNova", app_url="https://mestrelab.com", scraper=scrape_mestrenova),
     App(name="RStudio", app_url="https://docs.posit.co/ide/user/#rstudio-ide-oss-downloads", scraper=scrape_rstudio),
-    App(name="Orchard View", app_url="https://github.com/Jamf-Concepts/orchard-view", scraper=scrape_github)
+    App(name="Orchard View", app_url="https://github.com/Jamf-Concepts/orchard-view", scraper=scrape_github),
+    App(name="BetterZip", app_url="https://macitbetter.com/BetterZip6.rss", sparkle_version_key="shortVersionString", scraper=scrape_sparkle)
 ]

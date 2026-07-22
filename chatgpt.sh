@@ -7,11 +7,11 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 
 case $(uname -m) in
   arm64)
-    printf '%s' "Apple Silicon detected. Continuing..."
+    printf '%s\n' "Apple Silicon detected. Continuing..."
     ;;
 
   x86_64)
-    printf '%s' "Intel detected. Can not continue.
+    printf '%s\n' "Intel detected. Can not continue.
 App requires Apple Silicon."
     exit 1
     ;;

@@ -5,6 +5,23 @@ bundleName="ChatGPT Atlas"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
+case $(uname -m) in
+  arm64)
+    printf '%s\n' "Apple Silicon detected. Continuing..."
+    ;;
+
+  x86_64)
+    printf '%s\n' "Intel detected. Can not continue.
+App requires Apple Silicon."
+    exit 1
+    ;;
+
+  *)
+    printf '%s\n' "Unknown processor architecture. Exiting"
+    exit 1
+    ;;
+esac
+
 XML=$(/usr/bin/curl -s "https://persistent.oaistatic.com/atlas/public/sparkle_public_appcast.xml")
 currentVers=$(printf '%s' "${XML}" | /usr/bin/xmllint --xpath '//rss/channel/item[1]/title/text()' -)
 downloadURL=$(printf '%s' "${XML}" | /usr/bin/xmllint --xpath 'string(//rss/channel/item[1]/enclosure/@url)' -)
