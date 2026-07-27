@@ -85,7 +85,8 @@ from scrapers import (
     scrape_yubicoauth,
     scrape_zotero,
     scrape_zoom,
-    scrape_rstudio
+    scrape_rstudio,
+    scrape_pastebot
 )
 
 apps = [
@@ -265,5 +266,7 @@ apps = [
     App(name="MestReNova", app_url="https://mestrelab.com", scraper=scrape_mestrenova),
     App(name="RStudio", app_url="https://docs.posit.co/ide/user/#rstudio-ide-oss-downloads", scraper=scrape_rstudio),
     App(name="Orchard View", app_url="https://github.com/Jamf-Concepts/orchard-view", scraper=scrape_github),
-    App(name="BetterZip", app_url="https://macitbetter.com/BetterZip6.rss", sparkle_version_key="shortVersionString", scraper=scrape_sparkle)
+    App(name="BetterZip", app_url="https://macitbetter.com/BetterZip6.rss", sparkle_version_key="shortVersionString", scraper=scrape_sparkle),
+    App(name="Pastebot 2", app_url="https://tapbots.net/pastebot2/update.plist", scraper=scrape_pastebot),
+    App(name="Pastebot 3", app_url="https://tapbots.net/pastebot3/update.plist", scraper=scrape_pastebot)
 ]
