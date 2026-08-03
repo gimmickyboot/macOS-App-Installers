@@ -9,7 +9,7 @@ downloadURL=$(/usr/bin/curl -s --compressed "${URL}" | /usr/bin/awk '/macos/ && 
 FILE=${downloadURL##*/}
 currentVers=$(printf '%s' "${FILE}" | /usr/bin/awk -F- '{print $2}')
 currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
-SUM=$(/usr/bin/curl -s --compressed "${URL}/release/python-${currentVersNoDots}/" | /usr/bin/grep -A 4 pkg | /usr/bin/head -n 4 | /usr/bin/tail -n 1 | /usr/bin/awk '{print $1}' | /usr/bin/sed -e 's/<td>//' -e 's/<\/td>//')
+SHAHash=$(/usr/bin/curl -s --compressed "${URL}/release/python-${currentVersNoDots}/" | /usr/bin/grep -A 8 pkg.sigstore | /usr/bin/tail -n 1 | /usr/bin/xmllint --html --xpath 'string(//code[@class="checksum"])' - 2>/dev/null | /usr/bin/tr -d '\n')
 shortVers=$(printf '%s' "${currentVers}" | /usr/bin/cut -d . -f 1-2 -)
 
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName} ${shortVers}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
@@ -40,16 +40,14 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  # verify the hash
-  printf '%s\n' "${SUM} */tmp/${FILE}" > /tmp/checksum.md5
-  SUMResult=$(/sbin/md5sum --check /tmp/checksum.md5 2>/dev/null)
-  case "${SUMResult}" in
+  SHAResult=$(printf '%s' "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  case "${SHAResult}" in
     *OK)
-      printf '%s\n' "Hash has successfully verifed."
+      printf '%s\n' "SHA hash has successfully verifed."
       ;;
 
     *FAILED)
-      printf '%s\n' "Hash has failed verification"
+      printf '%s\n' "SHA hash has failed verification"
       exit 1
       ;;
 
