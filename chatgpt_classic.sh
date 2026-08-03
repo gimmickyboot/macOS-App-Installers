@@ -53,10 +53,11 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
-  /usr/bin/ditto -xk /tmp/"${FILE}" "${appInstallPath}"/.
-  /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
-  /usr/sbin/chown -R root:admin "${appInstallPath}"/"${bundleName}.app"
-  /bin/chmod -R 755 "${appInstallPath}"/"${bundleName}.app"
+  if ! installResult=$(/usr/sbin/installer -pkg /tmp/"${FILE}" -target / 2>&1); then
+    printf '%s\n' "An error occurred installing ${FILE}:"
+    printf '%s\n' "${installResult}"
+  else
+    printf '%s\n' "Successfully installed ${FILE}"
+  fi
   /bin/rm /tmp/"${FILE}"
 fi
