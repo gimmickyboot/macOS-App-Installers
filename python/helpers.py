@@ -62,8 +62,8 @@ def get_json(url: str, session: requests.Session, timeout: int = cfg.HTTP_TIMEOU
     return r.json()
 
 
-def get_xml(url: str, session: requests.Session, timeout: int = cfg.HTTP_TIMEOUT) -> ET.Element:
-    r = session.get(url, timeout=timeout, allow_redirects=True)
+def get_xml(url: str, session: requests.Session, timeout: int = cfg.HTTP_TIMEOUT, headers: dict | None = None) -> ET.Element:
+    r = session.get(url, timeout=timeout, allow_redirects=True, headers=headers)
     r.raise_for_status()
     return ET.fromstring(r.content)
 

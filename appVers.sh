@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.14 (27/07/2026)
+# v1.0.15 (05/08/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -1371,10 +1371,8 @@ for theApp in $theList; do
       ;;
 
     snagit)
-      currentVers=$(/usr/bin/curl -s "https://support.techsmith.com/hc/en-us/articles/37938520706957-Snagit-Mac-2025-Version-History" | /usr/bin/xmllint --html --xpath '//*/head/meta[2]/@content' - 2>/dev/null | /usr/bin/cut -d \" -f 2- - | /usr/bin/grep -oE 'in[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+' | /usr/bin/awk '{print $2}')
-      # versionYear=$(printf '%s' "${currentVers}" | /usr/bin/cut -c 1-4 -)
-      # downloadURL=$(/usr/bin/curl -s "https://sparkle.cloud.techsmith.com/api/v1/AppcastManifest/?version=${currentVers}&utm_source=product&utm_medium=snagit&utm_campaign=sm${versionYear}&ipc_item_name=snagit&ipc_platform=macos" | /usr/bin/xmllint --xpath '//rss/channel/item/enclosure/@url' - | /usr/bin/cut -d \" -f 2 -)
-      downloadURL="https://download.techsmith.com/snagitmac/releases/$(printf '%s' "${currentVers}" | /usr/bin/cut -c 3- - | /usr/bin/sed 's/\.//g')/snagit.dmg"
+      currentVers=$(/usr/bin/curl -s "https://support.techsmith.com/hc/en-us/articles/41975263481613-Snagit-Mac-2026-Version-History" | /usr/bin/xmllint --html --xpath '//*/head/meta[2]/@content' - 2>/dev/null | /usr/bin/cut -d \" -f 2- - | /usr/bin/grep -oE 'in[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+' | /usr/bin/awk '{print $2}')
+      downloadURL="https://download.techsmith.com/snagitmac/releases/${currentVers}/snagit.dmg"
       ;;
 
     story_architect)

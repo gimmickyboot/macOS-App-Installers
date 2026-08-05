@@ -239,7 +239,7 @@ apps = [
     App(name="shellcheck", app_url="https://github.com/koalaman/shellcheck", file_search_strings=["darwin.aarch64.tar.xz"], scraper=scrape_github),
     App(name="Signal", app_url="https://updates.signal.org/desktop/latest-mac.yml", download_url_template="https://updates.signal.org/desktop/signal-desktop-mac-universal-{version}.dmg", scraper=scrape_signal),
     App(name="Slack", app_url="https://slack.com/ssb/download-osx-universal", scraper=scrape_slack),
-    App(name="Snagit", app_url="https://support.techsmith.com/hc/en-us/articles/37938520706957-Snagit-Mac-2025-Version-History", download_url_template="https://download.techsmith.com/snagitmac/releases/{version}/snagit.dmg", scraper=scrape_snagit),
+    App(name="Snagit", app_url="https://sparkle.cloud.techsmith.com/api/v1/AppcastManifest/?version=26.0.1&utm_source=product&utm_medium=snagit&utm_campaign=sm2026&ipc_item_name=snagit&ipc_platform=macos", scraper=scrape_snagit),
     App(name="SQLite Browser", app_url="https://github.com/sqlitebrowser/sqlitebrowser", file_search_strings=[".dmg"], scraper=scrape_github),
     App(name="Story Architect", app_url="https://github.com/sequelpro/sequelpro", file_search_strings=[".dmg"], scraper=scrape_github),
     App(name="Storyboarder", app_url="https://github.com/wonderunit/storyboarder", file_search_strings=[".dmg"], scraper=scrape_github),

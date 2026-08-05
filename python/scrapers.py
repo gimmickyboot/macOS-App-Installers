@@ -1,3 +1,4 @@
+from packaging.version import InvalidVersion, Version
 from urllib.parse import urlparse, urlsplit
 
 import json
@@ -814,14 +815,27 @@ def scrape_oraclejava8(session: requests.Session, app: App) -> Result:
 
     xml_data = get_xml(app.app_url, session)
 
-    download_url = xml_data.find('./mapping/url').text
+    app_url_temp = xml_data.find('./mapping/url').text
 
-    file_name = filename_from_url(download_url)
-    version = extract_version(file_name).replace('_', '.')
-    # version = version_str.replace('_', '.')
+    xml_data = get_xml(app_url_temp, session)
+
+    items = xml_data.findall(".//channel/item")
+
+    if items is None:
+        raise ValueError("Could not find Sparkle item")
+
+    item = items[-1] if app.sparkle_latest_last else items[0]
+
+    enclosure = item.find('enclosure')
+    if enclosure is None:
+        raise ValueError("Could not find enclosure")
+
+    version_raw = item.findtext('title')
+    version = version_raw.split()[1].replace('_', '.')
     if not version:
         raise ValueError("Could not determine version")
 
+    download_url = enclosure.get('url')
     if not download_url:
         raise ValueError("Could not determine download URL")
 
@@ -1607,20 +1621,44 @@ def scrape_snagit(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
+    xml = get_xml(app.app_url, session, headers={"User-Agent": "Snagit/2026.0.0 Sparkle/2.8.0"})
 
-    soup = BeautifulSoup(html, "html.parser")
+    items = xml.findall(".//channel/item")
 
-    text = soup.find('meta', attrs={'name': 'description'})['content']
-    version = re.search(r'\d{4}\.\d+(?:\.\d+)*', text).group(0)
-    if not version:
-        raise ValueError("Could not determine version")
+    if not items:
+        raise ValueError("Could not find Sparkle item")
 
-    version_cleaned = version.replace(".", "")[2:]
+    releases = []
 
-    download_url = app.download_url_template.format(version=version_cleaned)
-    if not download_url:
-        raise ValueError("Could not determine download URL")
+    for item in items:
+        title = item.findtext('title')
+        enclosure = item.find('enclosure')
+
+        if not title or enclosure is None:
+            continue
+
+        version_tmp = title.strip()
+
+        download_url = enclosure.get('url')
+        if not download_url:
+            continue
+
+        try:
+            parsed_version = Version(version_tmp)
+        except InvalidVersion:
+            continue
+
+        releases.append(
+            (parsed_version, version_tmp, download_url)
+        )
+
+    if not releases:
+        raise ValueError("Could not find any valid releases")
+
+    _, version, download_url = max(
+        releases,
+        key=lambda release: release[0]
+    )
 
     return Result(
         name=app.name,
