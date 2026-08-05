@@ -8,7 +8,7 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 xmlData=$(/usr/bin/curl -s "https://www.charlessoft.com/cgi-bin/pacifist_sparkle.cgi")
 versionCount=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath '//rss/channel/item/title' - | /usr/bin/wc -l | /usr/bin/xargs)
 currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath "//rss/channel/item[${versionCount}]/title/text()" - | /usr/bin/awk '{print $2}')
-downloadURL=$(/usr/bin/curl -sI "$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath "string(//rss/channel/item[${versionCount}]/enclosure/@url)" -)" | /usr/bin/grep ^location | /usr/bin/awk '{print $2}')
+downloadURL=$(/usr/bin/curl -sI "$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath "string(//rss/channel/item[${versionCount}]/enclosure/@url)" -)" | /usr/bin/grep ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//')
 FILE=$(printf '%s' "${downloadURL}" | /usr/bin/grep -oE "Pacifist.*$")
 
 # compare version numbers
