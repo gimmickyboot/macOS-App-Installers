@@ -16,6 +16,7 @@ from scrapers import (
     scrape_codex,
     scrape_cycliqplus,
     scrape_displaylinkmanager,
+    scrape_dotnet,
     scrape_dropbox,
     scrape_druvainsync,
     scrape_elgatostreamdeck,
@@ -90,6 +91,9 @@ from scrapers import (
 )
 
 apps = [
+    App(name=".Net SDK 9 STS", app_url="https://dotnet.microsoft.com/en-us/download/dotnet/9.0", scraper=scrape_dotnet),
+    App(name=".Net SDK 10 LTS", app_url="https://dotnet.microsoft.com/en-us/download/dotnet/10.0", scraper=scrape_dotnet),
+    App(name=".Net SDK 11 Preview", app_url="https://dotnet.microsoft.com/en-us/download/dotnet/11.0", scraper=scrape_dotnet),
     App(name="1Password", app_url="https://releases.1password.com/mac/", download_url="https://downloads.1password.com/mac/1Password.pkg", scraper=scrape_onepassword),
     App(name="Adobe Acrobat Reader", app_url="https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/reader/current_version.txt", download_url_template="https://ardownload3.adobe.com/pub/adobe/acrobat/mac/AcrobatDC/{version}/AdobeReader{version}.dmg", scraper=scrape_adobeacrobatreader),
     App(name="Affinity Designer", app_url="https://store.serif.com/en-gb/update/macos/designer/2/", scraper=scrape_affinity),
@@ -107,10 +111,13 @@ apps = [
     App(name="Audacity", app_url="https://github.com/audacity/audacity", file_search_strings=["universal.dmg"], scraper=scrape_github),
     App(name="Avid Link", app_url="https://www.avid.com/products/avid-link#Downloads", scraper=scrape_avidlink),
     App(name="AWS CLI", app_url="https://raw.githubusercontent.com/aws/aws-cli/v2/CHANGELOG.rst", download_url="https://awscli.amazonaws.com/AWSCLIV2.pkg", scraper=scrape_awscli),
+    App(name="AzCopy", app_url="https://github.com/Azure/azure-storage-azcopy", file_search_strings=["azcopy_darwin_arm64"], scraper=scrape_github),
     App(name="Azure CLI", app_url="https://github.com/Azure/azure-cli", file_search_strings=["macos-arm64.tar.gz"], scraper=scrape_github),
-    App(name="Balena Etcher", app_url="https://github.com/balena-io/etcher", file_search_strings=["arm64.dmg"], scraper=scrape_github),
+    App(name="Azure Developer CLI (azd)", app_url="https://github.com/Azure/azure-dev", file_search_strings=["azd-darwin-arm64"], scraper=scrape_github),
+    App(name="Azure Functions CLI", app_url="https://github.com/Azure/azure-functions-core-tools", file_search_strings=["osx-arm64"], scraper=scrape_github),    App(name="Balena Etcher", app_url="https://github.com/balena-io/etcher", file_search_strings=["arm64.dmg"], scraper=scrape_github),
     App(name="BBEdit", app_url="https://www.barebones.com/products/bbedit", scraper=scrape_bbedit),
     App(name="BetterZip", app_url="https://macitbetter.com/BetterZip6.rss", sparkle_version_key="shortVersionString", scraper=scrape_sparkle),
+    App(name="Bicep CLI", app_url="https://github.com/Azure/bicep", file_search_strings=["bicep-osx-arm64"], scraper=scrape_github),
     App(name="Blender", app_url="https://www.blender.org/download/", scraper=scrape_blender),
     App(name="Brave Browser", app_url="https://updates.bravesoftware.com/sparkle/Brave-Browser/stable/appcast.xml", sparkle_version_key="version", scraper=scrape_sparkle),
     App(name="Catalyst Browse", app_url="https://cs.d-imaging.sony.co.jp/coay5hz6MI/2Aext1Frsi?product=CatalystBrowse&lang=en", download_url="https://di.update.sony.net/NEX/ch4055c566/Catalyst_Browse.dmg", scraper=scrape_catalystbrowse),

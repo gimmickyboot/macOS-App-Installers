@@ -2406,3 +2406,43 @@ def scrape_pastebot(session: requests.Session, app: App) -> Result:
         version=version,
         download_url=validate_download_url(download_url, session)
     )
+
+def scrape_dotnet(session: requests.Session, app: App) -> Result:
+    if not app.app_url:
+        raise ValueError("app_url is required")
+
+    url_scheme = urlsplit(app.app_url).scheme
+    url_netloc = urlsplit(app.app_url).netloc
+
+    html = get_text(app.app_url, session)
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    h3_tag_with_sdk = soup.find_all('h3', id=re.compile(r'^sdk'))
+    version_raw = h3_tag_with_sdk[0].get_text(strip=True)
+    version = version_raw.split(" ")[-1]
+    if not version:
+        raise ValueError("Could not determine version")
+
+    links = soup.find_all('a', href=True)
+    for link in links:
+        if f"sdk-{version}-macos-x64-installer" in link['href']:
+            download_url_tmp = f"{url_scheme}://{url_netloc}{link['href']}"
+
+    html = get_text(download_url_tmp, session)
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    links = soup.find_all('a', href=True)
+    for link in links:
+        if "pkg" in link['href']:
+            download_url = link['href']
+
+    if not download_url:
+        raise ValueError("Could not determine download URL")
+
+    return Result(
+        name=app.name,
+        version=version,
+        download_url=validate_download_url(download_url, session)
+    )
