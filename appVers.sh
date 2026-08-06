@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.15 (05/08/2026)
+# v1.0.16 (06/08/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -53,7 +53,7 @@ theFile="/tmp/versions-${todayDate}.txt"
 if [ "$#" -gt 0 ]; then
   theList=$(printf '%s ' "$@")
 else
-  theList="1password adobe_acrobat_reader affinity_designer affinity_photo affinity_publisher alfred altair android_studio api_utility arc artemis atext atom audacity avid_link avid_mediacomposer balenaetcher bbedit betterzip blender brave_browser catalyst_browse charles_proxy chatgpt_atlas chatgpt_classic chatgpt coconut_battery claude codex coderunner cyberduck cycliqplus displaylink_manager dockutil dropbox druva_insync dupeguru elgato_stream_deck endnote evernote fetch figma filemaker_pro firefox firefoxesr freemind fsmonitor gemini gimp github_desktop google_chrome google_earth_pro gpg_suite handbrake handbrakecli imazing_profile_editor insomnia intellij_ultimate isadora itsycal jamf_compliance_editor jamf_connect_configuration jamf_pppc_utility jamf_printer_manager jamf_replicator jamf_sync jamfCheck jamfHelper_constructor joplin jq karabena_elements keepassxc labchart logi_options_plus logi_tune low_profile lulu mafft makemkv managed_app_schema_builder mestrenova microsoft_autoupdater microsoft_companyportal microsoft_edge microsoft_excel microsoft_office_businesspro microsoft_office microsoft_onedrive microsoft_onenote microsoft_outlook microsoft_powerpoint microsoft_quickassist microsoft_remotehelp microsoft_teams2 microsoft_windows_app microsoft_word mist-cli mist mp4joiner mp4splitter mqttexplorer mut mysqlworkbench netbeans nextcloud_desktop nitropdf_pro nextpadplusplus nudge_suite nvivo obs_studio obsidian okta_verify openvpn_connect opera oracle_java8 orchard_view orion pacifist parallels pastebot2 pastebot3 pgadmin4 plex_media_player plex_media_server plugdata poll_everywhere postman powershell_lts powershell praat proxyman prune pulsar pycharm pymol pymol_lts python3 qlab r raspberry_pi_imager rstudio sap_privileges sassafras_keyaccess_mac sequelpro sf_symbols shellcheck signal slack snagit story_architect storyboarder subler sublime_merge sublime_text supportapp suspicous_package swiftdialog teamviewer teamviewerqs telegram theunarchiver thunderbird thunderbirdesr touch_designer transmission utm visual_studio_code vlc voodoopad webex whatsapp wireshark xquartz yubico_authenticator zoom zotero"
+  theList="1password adobe_acrobat_reader affinity_designer affinity_photo affinity_publisher alfred altair android_studio api_utility arc artemis atext atom audacity avid_link avid_mediacomposer awscli azcopy azure_developer_cli azure_functions_cli balenaetcher bbedit betterzip bicep_cli blender brave_browser catalyst_browse charles_proxy chatgpt_atlas chatgpt_classic chatgpt coconut_battery claude codex coderunner cyberduck cycliqplus displaylink_manager dockutil dotnet_sdk_9_sts dotnet_sdk_10_lts dotnet_sdk_11_preview dropbox druva_insync dupeguru elgato_stream_deck endnote evernote fetch figma filemaker_pro firefox firefoxesr freemind fsmonitor gemini gimp github_desktop google_chrome google_earth_pro gpg_suite handbrake handbrakecli imazing_profile_editor insomnia intellij_ultimate isadora itsycal jamf_compliance_editor jamf_connect_configuration jamf_pppc_utility jamf_printer_manager jamf_replicator jamf_sync jamfCheck jamfHelper_constructor joplin jq karabena_elements keepassxc labchart logi_options_plus logi_tune low_profile lulu mafft makemkv managed_app_schema_builder mestrenova microsoft_autoupdater microsoft_companyportal microsoft_edge microsoft_excel microsoft_office_businesspro microsoft_office microsoft_onedrive microsoft_onenote microsoft_outlook microsoft_powerpoint microsoft_quickassist microsoft_remotehelp microsoft_teams2 microsoft_windows_app microsoft_word mist-cli mist mp4joiner mp4splitter mqttexplorer mut mysqlworkbench netbeans nextcloud_desktop nitropdf_pro nextpadplusplus nudge_suite nvivo obs_studio obsidian okta_verify openvpn_connect opera oracle_java8 orchard_view orion pacifist parallels pastebot2 pastebot3 pgadmin4 plex_media_player plex_media_server plugdata poll_everywhere postman powershell_lts powershell praat proxyman prune pulsar pycharm pymol pymol_lts python3 qlab r raspberry_pi_imager rstudio sap_privileges sassafras_keyaccess_mac sequelpro sf_symbols shellcheck signal slack snagit story_architect storyboarder subler sublime_merge sublime_text supportapp suspicous_package swiftdialog teamviewer teamviewerqs telegram theunarchiver thunderbird thunderbirdesr touch_designer transmission utm visual_studio_code vlc voodoopad webex whatsapp wireshark xquartz yubico_authenticator zoom zotero"
 fi
 
 for theApp in $theList; do
@@ -206,6 +206,32 @@ for theApp in $theList; do
       downloadURL=""
       ;;
 
+    awscli)
+      currentVers=$(/usr/bin/curl -s "https://raw.githubusercontent.com/aws/aws-cli/v2/CHANGELOG.rst" | /usr/bin/grep ^2\. | /usr/bin/sort -V | /usr/bin/tail -n 1)
+      downloadURL="https://awscli.amazonaws.com/AWSCLIV2.pkg"
+      ;;
+
+    azcopy)
+      gitHubURL="https://github.com/Azure/azure-storage-azcopy"
+      latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
+      currentVers=$(basename "${latestReleaseURL}" | /usr/bin/sed 's/v//')
+      downloadURL="https://github.com$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/grep "azcopy_darwin_arm64" | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' -)"
+      ;;
+
+    azure_developer_cli)
+      gitHubURL="https://github.com/Azure/azure-dev"
+      latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
+      currentVers=$(basename "${latestReleaseURL}" | /usr/bin/sed 's/[a-z_-]//g')
+      downloadURL="https://github.com$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/grep "azd-darwin-arm64" | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' -)"
+      ;;
+
+    azure_functions_cli)
+      gitHubURL="https://github.com/Azure/azure-functions-core-tools"
+      latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
+      currentVers=$(basename "${latestReleaseURL}")
+      downloadURL="https://github.com$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/grep "osx-arm64" | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' -)"
+      ;;
+
     balenaetcher)
       gitHubURL="https://github.com/balena-io/etcher"
       latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
@@ -265,6 +291,13 @@ for theApp in $theList; do
       xmlData=$(/usr/bin/curl -s https://macitbetter.com/BetterZip6.rss)
       currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//rss/channel/item/enclosure/@*[name()="sparkle:shortVersionString"])' -)
       downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//rss/channel/item[1]/enclosure/@url)' -)
+      ;;
+
+    bicep_cli)
+      gitHubURL="https://github.com/Azure/bicep"
+      latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
+      currentVers=$(basename "${latestReleaseURL}" | /usr/bin/sed 's/v//')
+      downloadURL="https://github.com$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/grep "bicep-osx-arm64" | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' -)"
       ;;
 
     brave_browser)
@@ -372,6 +405,30 @@ for theApp in $theList; do
       latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
       currentVers=$(basename "${latestReleaseURL}" | /usr/bin/tr -d '[:alpha:]' | /usr/bin/sed 's/-//')
       downloadURL="https://github.com$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/grep pkg | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' -)"
+      ;;
+
+    dotnet_sdk_9_sts)
+      htmlData=$(/usr/bin/curl -s "https://dotnet.microsoft.com/en-us/download/dotnet/9.0")
+      currentVers=$(printf '%s' "${htmlData}" | /usr/bin/awk '/sdk-/ && !found { print; found = 1 }' | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//h3/text())' - - 2>/dev/null| /usr/bin/awk '{print $2}')
+      downloadURLTMP=$(printf '%s' "${htmlData}" | /usr/bin/grep "sdk-${currentVers}-macos-arm64-installer" | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - - 2>/dev/null)
+      htmlDataTMP=$(/usr/bin/curl -s "https://dotnet.microsoft.com${downloadURLTMP}")
+      downloadURL=$(printf '%s' "${htmlDataTMP}" | /usr/bin/grep pkg | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - - 2>/dev/null)
+      ;;
+
+    dotnet_sdk_10_lts)
+      htmlData=$(/usr/bin/curl -s "https://dotnet.microsoft.com/en-us/download/dotnet/10.0")
+      currentVers=$(printf '%s' "${htmlData}" | /usr/bin/awk '/sdk-/ && !found { print; found = 1 }' | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//h3/text())' - - 2>/dev/null| /usr/bin/awk '{print $2}')
+      downloadURLTMP=$(printf '%s' "${htmlData}" | /usr/bin/grep "sdk-${currentVers}-macos-arm64-installer" | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - - 2>/dev/null)
+      htmlDataTMP=$(/usr/bin/curl -s "https://dotnet.microsoft.com${downloadURLTMP}")
+      downloadURL=$(printf '%s' "${htmlDataTMP}" | /usr/bin/grep pkg | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - - 2>/dev/null)
+      ;;
+
+    dotnet_sdk_11_preview)
+      htmlData=$(/usr/bin/curl -s "https://dotnet.microsoft.com/en-us/download/dotnet/11.0")
+      currentVers=$(printf '%s' "${htmlData}" | /usr/bin/awk '/sdk-/ && !found { print; found = 1 }' | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//h3/text())' - - 2>/dev/null| /usr/bin/awk '{print $2}')
+      downloadURLTMP=$(printf '%s' "${htmlData}" | /usr/bin/grep "sdk-${currentVers}-macos-arm64-installer" | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - - 2>/dev/null)
+      htmlDataTMP=$(/usr/bin/curl -s "https://dotnet.microsoft.com${downloadURLTMP}")
+      downloadURL=$(printf '%s' "${htmlDataTMP}" | /usr/bin/grep pkg | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - - 2>/dev/null)
       ;;
 
     dropbox)
