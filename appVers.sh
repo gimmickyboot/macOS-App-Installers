@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.16 (06/08/2026)
+# v1.0.17 (13/08/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -782,7 +782,7 @@ for theApp in $theList; do
       ;;
 
     logi_options_plus)
-      currentVers=$(/usr/bin/curl -s "https://support.logi.com/hc/en-au/articles/1500005516462-Logi-Options-Release-Notes" | /usr/bin/grep "Version Release Date" | /usr/bin/grep -o 'content="[^"]*' | /usr/bin/head -n 1 | /usr/bin/awk '{print $4}')
+      currentVers=$(/usr/bin/curl -s "https://marketplace.logi.com/releasenotes/optionsplus/en" | /usr/bin/xmllint --html --xpath 'string(//span[normalize-space(.)="Latest"]/preceding-sibling::a[1])' - 2>/dev/null)
       downloadURL="https://download01.logi.com/web/ftp/pub/techsupport/optionsplus/logioptionsplus_installer.zip"
       ;;
 
