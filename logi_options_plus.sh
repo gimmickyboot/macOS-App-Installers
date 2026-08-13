@@ -5,7 +5,7 @@ bundleName="logioptionsplus"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleVersion 2>/dev/null | /usr/bin/cut -d "." -f 1-2 -)
 
-currentVers=$(/usr/bin/curl -s "https://support.logi.com/hc/en-au/articles/1500005516462-Logi-Options-Release-Notes" | /usr/bin/grep "Version Release Date" | /usr/bin/grep -o 'content="[^"]*' | /usr/bin/head -n 1 | /usr/bin/awk '{print $4}')
+currentVers=$(/usr/bin/curl -s "https://marketplace.logi.com/releasenotes/optionsplus/en" | /usr/bin/xmllint --html --xpath 'string(//span[normalize-space(.)="Latest"]/preceding-sibling::a[1])' - 2>/dev/null)
 downloadURL="https://download01.logi.com/web/ftp/pub/techsupport/optionsplus/logioptionsplus_installer.zip"
 FILE=${downloadURL##*/}
 

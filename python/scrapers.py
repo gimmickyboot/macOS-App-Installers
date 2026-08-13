@@ -1326,8 +1326,8 @@ def scrape_logioptionsplus(session: requests.Session, app: App) -> Result:
 
     soup = BeautifulSoup(html, "html.parser")
 
-    meta_tag = soup.find('meta', content=re.compile("Version Release Date"))
-    version = re.search(r"Version Release Date\s+(\d+\.\d+)", meta_tag['content']).group(1)
+    span_tag = soup.find('span', string='Latest')
+    version = span_tag.find_previous('a').get_text(strip=True)
     if not version:
         raise ValueError("Could not determine version")
 
