@@ -22,6 +22,6 @@ class App:
     sparkle_latest_last: bool = False
     json_search_string: Optional[str] = None
     useragent: Optional[str] = None
-    plist_pos: Optional[str] = None
+    plist_pos: Optional[int] = None
     file_search_strings: list[str] = field(default_factory=list)
     href_match_index: int = 0
