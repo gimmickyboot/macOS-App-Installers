@@ -2392,7 +2392,7 @@ def scrape_pastebot(session: requests.Session, app: App) -> Result:
     if not isinstance(plist_data_raw, list) or not plist_data_raw:
         raise ValueError("Expected plist root to be a non-empty list")
 
-    plist_data = plist_data_raw[-1]
+    plist_data = plist_data_raw[int(app.plist_pos)]
     version = plist_data.get("shortVersion")
     if not version:
         raise ValueError("Could not determine version")

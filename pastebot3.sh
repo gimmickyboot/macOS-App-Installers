@@ -6,9 +6,8 @@ appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 xmlData=$(/usr/bin/curl -s "https://tapbots.net/pastebot3/update.plist")
-theCount=$(printf '%s' "${xmlData}" | /usr/bin/grep shortVersion | /usr/bin/wc -l | /usr/bin/xargs)
-currentVers=$(printf '%s' "${xmlData}"  | /usr/bin/xmllint --xpath "string((//key[.=\"shortVersion\"]/following-sibling::string[1])[${theCount}])" -)
-downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath string"((//key[.=\"downloadURL\"]/following-sibling::string[1])[${theCount}])" -)
+currentVers=$(printf '%s' "${xmlData}"  | /usr/bin/xmllint --xpath "string((//key[.=\"shortVersion\"]/following-sibling::string[1])[1])" -)
+downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath string"((//key[.=\"downloadURL\"]/following-sibling::string[1])[1])" -)
 FILE=${downloadURL##*/}
 
 # compare version numbers
