@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.17 (13/08/2026)
+# v1.0.18 (26/08/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -53,7 +53,7 @@ theFile="/tmp/versions-${todayDate}.txt"
 if [ "$#" -gt 0 ]; then
   theList=$(printf '%s ' "$@")
 else
-  theList="1password adobe_acrobat_reader affinity_designer affinity_photo affinity_publisher alfred altair android_studio api_utility arc artemis atext atom audacity avid_link avid_mediacomposer awscli azcopy azure_developer_cli azure_functions_cli balenaetcher bbedit betterzip bicep_cli blender brave_browser catalyst_browse charles_proxy chatgpt_atlas chatgpt_classic chatgpt coconut_battery claude codex coderunner cyberduck cycliqplus displaylink_manager dockutil dotnet_sdk_9_sts dotnet_sdk_10_lts dotnet_sdk_11_preview dropbox druva_insync dupeguru elgato_stream_deck endnote evernote fetch figma filemaker_pro firefox firefoxesr freemind fsmonitor gemini gimp github_desktop google_chrome google_earth_pro gpg_suite handbrake handbrakecli imazing_profile_editor insomnia intellij_ultimate isadora itsycal jamf_compliance_editor jamf_connect_configuration jamf_pppc_utility jamf_printer_manager jamf_replicator jamf_sync jamfCheck jamfHelper_constructor joplin jq karabena_elements keepassxc labchart logi_options_plus logi_tune low_profile lulu mafft makemkv managed_app_schema_builder mestrenova microsoft_autoupdater microsoft_companyportal microsoft_edge microsoft_excel microsoft_office_businesspro microsoft_office microsoft_onedrive microsoft_onenote microsoft_outlook microsoft_powerpoint microsoft_quickassist microsoft_remotehelp microsoft_teams2 microsoft_windows_app microsoft_word mist-cli mist mp4joiner mp4splitter mqttexplorer mut mysqlworkbench netbeans nextcloud_desktop nitropdf_pro nextpadplusplus nudge_suite nvivo obs_studio obsidian okta_verify openvpn_connect opera oracle_java8 orchard_view orion pacifist parallels pastebot2 pastebot3 pgadmin4 plex_media_player plex_media_server plugdata poll_everywhere postman powershell_lts powershell praat proxyman prune pulsar pycharm pymol pymol_lts python3 qlab r raspberry_pi_imager rstudio sap_privileges sassafras_keyaccess_mac sequelpro sf_symbols shellcheck signal slack snagit story_architect storyboarder subler sublime_merge sublime_text supportapp suspicous_package swiftdialog teamviewer teamviewerqs telegram theunarchiver thunderbird thunderbirdesr touch_designer transmission utm visual_studio_code vlc voodoopad webex whatsapp wireshark xquartz yubico_authenticator zoom zotero"
+  theList="1password adobe_acrobat_reader affinity_designer affinity_photo affinity_publisher alfred altair android_studio api_utility arc artemis atext atom audacity avid_link avid_mediacomposer awscli azcopy azure_developer_cli azure_functions_cli balenaetcher bbedit betterzip bicep_cli blender brave_browser catalyst_browse charles_proxy chatgpt_atlas chatgpt_classic chatgpt coconut_battery claude codex coderunner cyberduck cycliqplus displaylink_manager dockutil dotnet_sdk_9_sts dotnet_sdk_10_lts dotnet_sdk_11_preview dropbox druva_insync dupeguru elgato_stream_deck endnote evernote fetch ffmpeg ffplay ffprobe ffserver figma filemaker_pro firefox firefoxesr freemind fsmonitor gemini gimp github_desktop google_chrome google_earth_pro gpg_suite handbrake handbrakecli imazing_profile_editor insomnia intellij_ultimate isadora itsycal jamf_compliance_editor jamf_connect_configuration jamf_pppc_utility jamf_printer_manager jamf_replicator jamf_sync jamfCheck jamfHelper_constructor joplin jq karabena_elements keepassxc labchart logi_options_plus logi_tune low_profile lulu mafft makemkv managed_app_schema_builder mestrenova microsoft_autoupdater microsoft_companyportal microsoft_edge microsoft_excel microsoft_office_businesspro microsoft_office microsoft_onedrive microsoft_onenote microsoft_outlook microsoft_powerpoint microsoft_quickassist microsoft_remotehelp microsoft_teams2 microsoft_windows_app microsoft_word mist-cli mist mp4joiner mp4splitter mqttexplorer mut mysqlworkbench netbeans nextcloud_desktop nitropdf_pro nextpadplusplus nudge_suite nvivo obs_studio obsidian okta_verify openvpn_connect opera oracle_java8 orchard_view orion pacifist parallels pastebot2 pastebot3 pgadmin4 plex_media_player plex_media_server plugdata poll_everywhere postman powershell_lts powershell praat proxyman prune pulsar pycharm pymol pymol_lts python3 qlab r raspberry_pi_imager rstudio sap_privileges sassafras_keyaccess_mac sequelpro sf_symbols shellcheck signal slack snagit story_architect storyboarder subler sublime_merge sublime_text supportapp suspicous_package swiftdialog teamviewer teamviewerqs telegram theunarchiver thunderbird thunderbirdesr touch_designer transmission utm visual_studio_code vlc voodoopad webex whatsapp wireshark xquartz yubico_authenticator zoom zotero"
 fi
 
 for theApp in $theList; do
@@ -488,6 +488,30 @@ for theApp in $theList; do
       URL="https://fetchsoftworks.com"
       downloadURL="${URL}$(/usr/bin/curl -s "${URL}/fetch/download/" | /usr/bin/grep "Download Fetch" | /usr/bin/head -n 2 | /usr/bin/tail -n 1 | /usr/bin/xmllint --html --xpath '//a/@href' - | /usr/bin/cut -d \" -f 2 -)"
       currentVers=$(basename "${downloadURL}" | /usr/bin/grep -oE '[0-9]+(\.[0-9]+)*')
+      ;;
+
+    ffmpeg)
+      jsonData=$(/usr/bin/curl -s "https://evermeet.cx/ffmpeg/info/ffmpeg/release")
+      currentVers=$(printf '%s' "${jsonData}" | "${jqBin}" -r .version)
+      downloadURL=$(printf '%s' "${jsonData}" | "${jqBin}" -r .download.zip.url)
+      ;;
+
+    ffplay)
+      jsonData=$(/usr/bin/curl -s "https://evermeet.cx/ffmpeg/info/ffplay/release")
+      currentVers=$(printf '%s' "${jsonData}" | "${jqBin}" -r .version)
+      downloadURL=$(printf '%s' "${jsonData}" | "${jqBin}" -r .download.zip.url)
+      ;;
+
+    ffprobe)
+      jsonData=$(/usr/bin/curl -s "https://evermeet.cx/ffmpeg/info/ffprobe/release")
+      currentVers=$(printf '%s' "${jsonData}" | "${jqBin}" -r .version)
+      downloadURL=$(printf '%s' "${jsonData}" | "${jqBin}" -r .download.zip.url)
+      ;;
+
+    ffserver)
+      jsonData=$(/usr/bin/curl -s "https://evermeet.cx/ffmpeg/info/ffserver/release")
+      currentVers=$(printf '%s' "${jsonData}" | "${jqBin}" -r .version)
+      downloadURL=$(printf '%s' "${jsonData}" | "${jqBin}" -r .download.zip.url)
       ;;
 
     figma)
