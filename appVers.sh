@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.18 (26/08/2026)
+# v1.0.19 (27/08/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -1167,9 +1167,8 @@ for theApp in $theList; do
 
     pastebot3)
       xmlData=$(/usr/bin/curl -s "https://tapbots.net/pastebot3/update.plist")
-      theCount=$(printf '%s' "${xmlData}" | /usr/bin/grep shortVersion | /usr/bin/wc -l | /usr/bin/xargs)
-      currentVers=$(printf '%s' "${xmlData}"  | /usr/bin/xmllint --xpath "string((//key[.=\"shortVersion\"]/following-sibling::string[1])[${theCount}])" -)
-      downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath string"((//key[.=\"downloadURL\"]/following-sibling::string[1])[${theCount}])" -)
+      currentVers=$(printf '%s' "${xmlData}"  | /usr/bin/xmllint --xpath "string((//key[.=\"shortVersion\"]/following-sibling::string[1])[1])" -)
+      downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath string"((//key[.=\"downloadURL\"]/following-sibling::string[1])[1])" -)
       ;;
 
     pgadmin4)
