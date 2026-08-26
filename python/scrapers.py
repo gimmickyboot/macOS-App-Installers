@@ -2446,3 +2446,22 @@ def scrape_dotnet(session: requests.Session, app: App) -> Result:
         version=version,
         download_url=validate_download_url(download_url, session)
     )
+
+def scrape_ffmpeg(session: requests.Session, app: App) -> Result:
+    if not app.app_url:
+        raise ValueError("app_url is required")
+
+    json_data = get_json(app.app_url, session)
+
+    version = json_data["version"]
+
+    download_url = json_data["download"]["zip"]["url"]
+
+    if not download_url:
+        raise ValueError("Could not determine download URL")
+
+    return Result(
+        name=app.name,
+        version=version,
+        download_url=validate_download_url(download_url, session)
+    )
