@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.19 (27/08/2026)
+# v1.0.20 (28/08/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -53,7 +53,7 @@ theFile="/tmp/versions-${todayDate}.txt"
 if [ "$#" -gt 0 ]; then
   theList=$(printf '%s ' "$@")
 else
-  theList="1password adobe_acrobat_reader affinity_designer affinity_photo affinity_publisher alfred altair android_studio api_utility arc artemis atext atom audacity avid_link avid_mediacomposer awscli azcopy azure_developer_cli azure_functions_cli balenaetcher bbedit betterzip bicep_cli blender brave_browser catalyst_browse charles_proxy chatgpt_atlas chatgpt_classic chatgpt coconut_battery claude codex coderunner cyberduck cycliqplus displaylink_manager dockutil dotnet_sdk_9_sts dotnet_sdk_10_lts dotnet_sdk_11_preview dropbox druva_insync dupeguru elgato_stream_deck endnote evernote fetch ffmpeg ffplay ffprobe ffserver figma filemaker_pro firefox firefoxesr freemind fsmonitor gemini gimp github_desktop google_chrome google_earth_pro gpg_suite handbrake handbrakecli imazing_profile_editor insomnia intellij_ultimate isadora itsycal jamf_compliance_editor jamf_connect_configuration jamf_pppc_utility jamf_printer_manager jamf_replicator jamf_sync jamfCheck jamfHelper_constructor joplin jq karabena_elements keepassxc labchart logi_options_plus logi_tune low_profile lulu mafft makemkv managed_app_schema_builder mestrenova microsoft_autoupdater microsoft_companyportal microsoft_edge microsoft_excel microsoft_office_businesspro microsoft_office microsoft_onedrive microsoft_onenote microsoft_outlook microsoft_powerpoint microsoft_quickassist microsoft_remotehelp microsoft_teams2 microsoft_windows_app microsoft_word mist-cli mist mp4joiner mp4splitter mqttexplorer mut mysqlworkbench netbeans nextcloud_desktop nitropdf_pro nextpadplusplus nudge_suite nvivo obs_studio obsidian okta_verify openvpn_connect opera oracle_java8 orchard_view orion pacifist parallels pastebot2 pastebot3 pgadmin4 plex_media_player plex_media_server plugdata poll_everywhere postman powershell_lts powershell praat proxyman prune pulsar pycharm pymol pymol_lts python3 qlab r raspberry_pi_imager rstudio sap_privileges sassafras_keyaccess_mac sequelpro sf_symbols shellcheck signal slack snagit story_architect storyboarder subler sublime_merge sublime_text supportapp suspicous_package swiftdialog teamviewer teamviewerqs telegram theunarchiver thunderbird thunderbirdesr touch_designer transmission utm visual_studio_code vlc voodoopad webex whatsapp wireshark xquartz yubico_authenticator zoom zotero"
+  theList="1password 1password_beta adobe_acrobat_reader affinity_designer affinity_photo affinity_publisher alfred altair android_studio api_utility arc artemis atext atom audacity avid_link avid_mediacomposer awscli azcopy azure_developer_cli azure_functions_cli balenaetcher bbedit betterzip bicep_cli blender brave_browser catalyst_browse charles_proxy chatgpt_atlas chatgpt_classic chatgpt coconut_battery claude codex coderunner cyberduck cycliqplus displaylink_manager dockutil dotnet_sdk_9_sts dotnet_sdk_10_lts dotnet_sdk_11_preview dropbox druva_insync dupeguru elgato_stream_deck endnote evernote fetch ffmpeg ffplay ffprobe ffserver figma filemaker_pro firefox firefoxesr freemind fsmonitor gemini gimp github_desktop google_chrome google_earth_pro gpg_suite handbrake handbrakecli imazing_profile_editor insomnia intellij_ultimate isadora itsycal jamf_compliance_editor jamf_connect_configuration jamf_pppc_utility jamf_printer_manager jamf_replicator jamf_sync jamfCheck jamfHelper_constructor joplin jq karabena_elements keepassxc labchart logi_options_plus logi_tune low_profile lulu mafft makemkv managed_app_schema_builder mestrenova microsoft_autoupdater microsoft_companyportal microsoft_edge microsoft_excel microsoft_office_businesspro microsoft_office microsoft_onedrive microsoft_onenote microsoft_outlook microsoft_powerpoint microsoft_quickassist microsoft_remotehelp microsoft_teams2 microsoft_windows_app microsoft_word mist-cli mist mp4joiner mp4splitter mqttexplorer mut mysqlworkbench netbeans nextcloud_desktop nitropdf_pro nextpadplusplus nudge_suite nvivo obs_studio obsidian okta_verify openvpn_connect opera oracle_java8 orchard_view orion pacifist parallels pastebot2 pastebot3 pgadmin4 plex_media_player plex_media_server plugdata poll_everywhere postman powershell_lts powershell praat proxyman prune pulsar pycharm pymol pymol_lts python3 qlab r raspberry_pi_imager rstudio sap_privileges sassafras_keyaccess_mac sequelpro sf_symbols shellcheck signal slack snagit story_architect storyboarder subler sublime_merge sublime_text supportapp suspicous_package swiftdialog teamviewer teamviewerqs telegram theunarchiver thunderbird thunderbirdesr touch_designer transmission utm visual_studio_code vlc voodoopad webex whatsapp wireshark xquartz yubico_authenticator zoom zotero"
 fi
 
 for theApp in $theList; do
@@ -61,6 +61,11 @@ for theApp in $theList; do
     1password)
       downloadURL="https://downloads.1password.com/mac/1Password.pkg"
       currentVers=$(/usr/bin/curl -s "https://releases.1password.com/mac/" | /usr/bin/xmllint --format --html - 2>/dev/null | /usr/bin/grep -B 7 '<h2 class="c-heading c-heading--2 u-mb-2 u-mb-0@md u-mt-4 u-mt-0@md">1Password for Mac</h2>' | /usr/bin/grep "Updated to" | /usr/bin/awk -F ">" '{ print $2 }' | /usr/bin/awk '{print $3}' | /usr/bin/head -n 1)
+      ;;
+
+    1password_beta)
+      currentVers=$(/usr/bin/curl -s "https://releases.1password.com/mac/beta/" | /usr/bin/xmllint --format --html - 2>/dev/null | /usr/bin/grep "Updated to" | /usr/bin/awk -F '>' '{ x=$2; split(x, a, /[[:space:]]+/); print a[3] }')
+      downloadURL="https://downloads.1password.com/mac/1Password-latest.BETA-aarch64.zip"
       ;;
 
     adobe_acrobat_reader)
@@ -858,13 +863,13 @@ for theApp in $theList; do
       ;;
 
     microsoft_autoupdater)
-      xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSau04.xml')
+      xmlData=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSau04.xml')
       currentVers=$(printf '%s' "${xmlData}"  | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $3}')
       downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Location"]/following-sibling::string[1])' -)
       ;;
 
     microsoft_companyportal)
-      xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409IMCP01.xml')
+      xmlData=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409IMCP01.xml')
       currentVers=$(printf '%s' "${xmlData}"  | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $4}')
       downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Location"]/following-sibling::string[1])' -)
       ;;
@@ -876,70 +881,70 @@ for theApp in $theList; do
       ;;
 
     microsoft_excel)
-      xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409XCEL2019.xml')
+      xmlData=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409XCEL2019.xml')
       currentVers=$(printf '%s' "${xmlData}"  | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $4}')
       downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="FullUpdaterLocation"]/following-sibling::string[1])' -)
       ;;
 
     microsoft_office_businesspro)
-      currentVers=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSWD2019.xml' | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $4}')
+      currentVers=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSWD2019.xml' | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $4}')
       downloadURL=$(/usr/bin/curl -sI "https://go.microsoft.com/fwlink/?linkid=2009112" | /usr/bin/grep -i "^Location"| /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
       ;;
 
     microsoft_office)
-      currentVers=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSWD2019.xml' | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $4}')
+      currentVers=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSWD2019.xml' | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $4}')
       downloadURL=$(/usr/bin/curl -sI "https://go.microsoft.com/fwlink/?linkid=525133" | /usr/bin/grep -i "^Location"| /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
       ;;
 
     microsoft_onedrive)
-      xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409ONDR18.xml')
+      xmlData=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409ONDR18.xml')
       currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $3}')
       downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Location"]/following-sibling::string[1])' -)
     ;;
 
     microsoft_onenote)
-      xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409ONMC2019.xml')
+      xmlData=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409ONMC2019.xml')
       currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $4}')
       downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="FullUpdaterLocation"]/following-sibling::string[1])' -)
       ;;
 
     microsoft_outlook)
-      xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409OPIM2019.xml')
+      xmlData=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409OPIM2019.xml')
       currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $4}')
       downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="FullUpdaterLocation"]/following-sibling::string[1])' -)
       ;;
 
     microsoft_powerpoint)
-      xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409PPT32019.xml')
+      xmlData=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409PPT32019.xml')
       currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $4}')
       downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="FullUpdaterLocation"]/following-sibling::string[1])' -)
       ;;
 
     microsoft_quickassist)
-      xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSQA01.xml')
+      xmlData=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSQA01.xml')
       currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Update Version"]/following-sibling::string[1])' -)
       downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Location"]/following-sibling::string[1])' -)
       ;;
 
     microsoft_remotehelp)
-      xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSRH01.xml')
+      xmlData=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSRH01.xml')
       currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Update Version"]/following-sibling::string[1])' -)
       downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Location"]/following-sibling::string[1])' -)
       ;;
 
     microsoft_teams2)
-      xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409TEAMS21.xml')
+      xmlData=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409TEAMS21.xml')
       currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $3}')
-      downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Location"]/following-sibling::string[1])' -)
+      downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="FullUpdaterLocation"]/following-sibling::string[1])' -)
       ;;
 
     microsoft_windows_app)
-      downloadURL=$(/usr/bin/curl -s "https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSRD10.xml" | /usr/bin/grep pkg | /usr/bin/head -n 1 | /usr/bin/sed -e 's/<[^>]*>//g' | xargs)
+      downloadURL=$(/usr/bin/curl -s "https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSRD10.xml" | /usr/bin/grep pkg | /usr/bin/head -n 1 | /usr/bin/sed -e 's/<[^>]*>//g' | xargs)
       currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/grep -oE '[0-9]+(\.[0-9]+)+')
       ;;
 
     microsoft_word)
-      xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSWD2019.xml')
+      xmlData=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSWD2019.xml')
       currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $4}')
       downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="FullUpdaterLocation"]/following-sibling::string[1])' -)
       ;;
@@ -1072,10 +1077,8 @@ for theApp in $theList; do
       ;; 
 
     obsidian)
-      gitHubURL="https://github.com/obsidianmd/obsidian-releases"
-      latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
-      currentVers=$(basename "${latestReleaseURL}" | /usr/bin/rev | /usr/bin/awk -F v '{print $1}' | /usr/bin/rev)
-      downloadURL="https://github.com$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/grep dmg | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' -)"
+      currentVers=$(/usr/bin/curl -s "https://obsidian.md/changelog.xml" | /usr/bin/grep "<title>" | /usr/bin/grep "Desktop (Public)" | /usr/bin/head -n 1 | /usr/bin/awk '{print $2}')
+      downloadURL="https://github.com/obsidianmd/obsidian-releases/releases/download/v${currentVers}/Obsidian-${currentVers}.dmg"
       ;;
 
     okta_verify)
