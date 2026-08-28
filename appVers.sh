@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.20 (28/08/2026)
+# v1.0.21 (28/08/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -59,8 +59,8 @@ fi
 for theApp in $theList; do
   case $theApp in
     1password)
-      downloadURL="https://downloads.1password.com/mac/1Password.pkg"
       currentVers=$(/usr/bin/curl -s "https://releases.1password.com/mac/" | /usr/bin/xmllint --format --html - 2>/dev/null | /usr/bin/grep -B 7 '<h2 class="c-heading c-heading--2 u-mb-2 u-mb-0@md u-mt-4 u-mt-0@md">1Password for Mac</h2>' | /usr/bin/grep "Updated to" | /usr/bin/awk -F ">" '{ print $2 }' | /usr/bin/awk '{print $3}' | /usr/bin/head -n 1)
+      downloadURL="https://downloads.1password.com/mac/1Password.pkg"
       ;;
 
     1password_beta)
