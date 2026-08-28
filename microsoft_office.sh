@@ -5,7 +5,7 @@ bundleName="Microsoft Word"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-currentVers=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSWD2019.xml' | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $4}')
+currentVers=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSWD2019.xml' | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $4}')
 downloadURL=$(/usr/bin/curl -sI "https://go.microsoft.com/fwlink/?linkid=525133" | /usr/bin/grep -i "^Location"| /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
 FILE=${downloadURL##*/}
 

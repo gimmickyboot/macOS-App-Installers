@@ -7,7 +7,7 @@ bundleName="Windows App"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-downloadURL=$(/usr/bin/curl -s "https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSRD10.xml" | /usr/bin/grep pkg | /usr/bin/head -n 1 | /usr/bin/sed -e 's/<[^>]*>//g' | xargs)
+downloadURL=$(/usr/bin/curl -s "https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409MSRD10.xml" | /usr/bin/grep pkg | /usr/bin/head -n 1 | /usr/bin/sed -e 's/<[^>]*>//g' | xargs)
 currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/grep -oE '[0-9]+(\.[0-9]+)+')
 FILE=${downloadURL##*/}
 

@@ -1,20 +1,33 @@
 #!/bin/sh
 
 appInstallPath="/Applications"
-bundleName="Microsoft Teams"
-appName="${bundleName}"
+bundleName="1Password"
+appName="1Password BETA"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-xmlData=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409TEAMS21.xml')
-currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $3}')
-downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="FullUpdaterLocation"]/following-sibling::string[1])' -)
+case $(uname -m) in
+  arm64)
+    archType="aarch64"
+    ;;
+
+  x86_64)
+    archType="x86_64"
+    ;;
+
+  *)
+    printf '%s\n' "Unknown processor architecture. Exiting"
+    exit 1
+    ;;
+esac
+currentVers=$(/usr/bin/curl -s "https://releases.1password.com/mac/beta/" | /usr/bin/xmllint --format --html - 2>/dev/null | /usr/bin/grep "Updated to" | /usr/bin/awk -F '>' '{ x=$2; split(x, a, /[[:space:]]+/); print a[3] }')
+downloadURL="https://downloads.1password.com/mac/1Password-latest.BETA-${archType}.zip"
 FILE=${downloadURL##*/}
 
 # compare version numbers
 if [ "${installedVers}" ]; then
   printf '%s\n' "${appName} v${installedVers} is installed."
-  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/\.//g')
-  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/\.//g')
+  installedVersNoDots=$(printf '%s' "${installedVers}" | /usr/bin/sed 's/[A-Z.-]//g')
+  currentVersNoDots=$(printf '%s' "${currentVers}" | /usr/bin/sed 's/[A-Z.-]//g')
 
   # pad out currentVersNoDots to match installedVersNoDots
   installedVersNoDotsCount=${#installedVersNoDots}
@@ -36,11 +49,10 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  if ! installResult=$(/usr/sbin/installer -pkg /tmp/"${FILE}" -target / 2>&1); then
-    printf '%s\n' "An error occurred installing ${FILE}:"
-    printf '%s\n' "${installResult}"
-  else
-    printf '%s\n' "Successfully installed ${FILE}"
-  fi
+  /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
+  /usr/bin/ditto -xk /tmp/"${FILE}" "${appInstallPath}"/.
+  /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
+  /usr/sbin/chown -R root:admin "${appInstallPath}"/"${bundleName}.app"
+  /bin/chmod -R 755 "${appInstallPath}"/"${bundleName}.app"
   /bin/rm /tmp/"${FILE}"
 fi

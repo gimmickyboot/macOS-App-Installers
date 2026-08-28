@@ -369,13 +369,13 @@ def scrape_microsoft_plist(session: requests.Session, app: App) -> Result:
         version = plist_data["Update Version"]
     else:
         version = re.search(r"\d+(?:\.\d+)+", title).group()
-    # print(version)
 
     if not version:
         raise ValueError("Could not determine version")
 
     if not app.download_url:
-        download_url = plist_data["Location"]
+        search_key = app.plist_search_key or "Location"
+        download_url = plist_data[search_key]
         if not download_url:
             raise ValueError("Could not determine download URL")
     else:
@@ -2459,6 +2459,45 @@ def scrape_ffmpeg(session: requests.Session, app: App) -> Result:
 
     if not download_url:
         raise ValueError("Could not determine download URL")
+
+    return Result(
+        name=app.name,
+        version=version,
+        download_url=validate_download_url(download_url, session)
+    )
+
+
+def scrape_obsidian(session: requests.Session, app: App) -> Result:
+    if not app.app_url:
+        raise ValueError("app_url is required")
+
+    if not app.download_url_template:
+        raise ValueError("download_url_template is required")
+
+    xml = get_xml(app.app_url, session)
+
+    ns = {
+        "atom": "http://www.w3.org/2005/Atom"
+    }
+
+    entries = xml.findall(".//atom:entry", ns)
+    if not entries:
+        raise ValueError("Could not find RSS entries")
+
+    for entry in entries:
+        title = entry.findtext("atom:title", namespaces=ns)
+
+        if title and "Desktop (Public)" in title:
+            version = extract_version(title)
+            break
+    else:
+        raise ValueError(
+            "Could not find Desktop (Public) release"
+        )
+
+    download_url = app.download_url_template.format(version=version)
+    if not download_url:
+        raise ValueError("Could not determine download_url")
 
     return Result(
         name=app.name,

@@ -5,12 +5,10 @@ bundleName="Obsidian"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-gitHubURL="https://github.com/obsidianmd/obsidian-releases"
-latestReleaseURL=$(/usr/bin/curl -sI "${gitHubURL}/releases/latest" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//g')
-currentVers=$(basename "${latestReleaseURL}" | /usr/bin/rev | /usr/bin/awk -F v '{print $1}' | /usr/bin/rev)
-downloadURL="https://github.com$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/grep dmg | /usr/bin/head -n 1 | /usr/bin/xmllint --html --xpath 'string(//a/@href)' -)"
+currentVers=$(/usr/bin/curl -s "https://obsidian.md/changelog.xml" | /usr/bin/grep "<title>" | /usr/bin/grep "Desktop (Public)" | /usr/bin/head -n 1 | /usr/bin/awk '{print $2}')
+downloadURL="https://github.com/obsidianmd/obsidian-releases/releases/download/v${currentVers}/Obsidian-${currentVers}.dmg"
 FILE=${downloadURL##*/}
-SHAHash=$(/usr/bin/curl -sL "$(printf '%s' "${latestReleaseURL}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/awk "f&&/sha256:/{print; exit} /${FILE}/{f=1}"| /usr/bin/sed -E 's/.*sha256:([0-9a-fA-F]{64}).*/\1/')
+SHAHash=$(/usr/bin/curl -sL "$(printf '%s' "https://github.com/obsidianmd/obsidian-releases/releases/tag/v${currentVers}" | /usr/bin/sed 's/tag/expanded_assets/')" | /usr/bin/awk "f&&/sha256:/{print; exit} /${FILE}/{f=1}"| /usr/bin/sed -E 's/.*sha256:([0-9a-fA-F]{64}).*/\1/')
 
 # compare version numbers
 if [ "${installedVers}" ]; then

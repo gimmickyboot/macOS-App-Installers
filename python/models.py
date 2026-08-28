@@ -23,5 +23,6 @@ class App:
     json_search_string: Optional[str] = None
     useragent: Optional[str] = None
     plist_pos: Optional[int] = None
+    plist_search_key: Optional[str] = None
     file_search_strings: list[str] = field(default_factory=list)
     href_match_index: int = 0

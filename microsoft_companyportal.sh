@@ -5,7 +5,7 @@ bundleName="Company Portal"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409IMCP01.xml')
+xmlData=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409IMCP01.xml')
 currentVers=$(printf '%s' "${xmlData}"  | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $4}')
 downloadURL=$(/usr/bin/curl -sI "https://go.microsoft.com/fwlink/?linkid=853070" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}')
 FILE=${downloadURL##*/}

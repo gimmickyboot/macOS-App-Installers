@@ -7,7 +7,7 @@ bundleName="Microsoft OutLook"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-xmlData=$(/usr/bin/curl -s 'https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409OPIM2019.xml')
+xmlData=$(/usr/bin/curl -s 'https://res.public.onecdn.static.microsoft/mro1cdnstorage/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/0409OPIM2019.xml')
 currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="Title"]/following-sibling::string[1])' - | /usr/bin/awk '{print $4}')
 downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath 'string(//key[.="FullUpdaterLocation"]/following-sibling::string[1])' -)
 FILE=${downloadURL##*/}

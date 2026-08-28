@@ -5,9 +5,9 @@ bundleName="1Password"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
+currentVers=$(/usr/bin/curl -s "https://releases.1password.com/mac/" | /usr/bin/xmllint --format --html - 2>/dev/null | /usr/bin/grep -B 7 '<h2 class="c-heading c-heading--2 u-mb-2 u-mb-0@md u-mt-4 u-mt-0@md">1Password for Mac</h2>' | /usr/bin/grep "Updated to" | /usr/bin/awk -F ">" '{ print $2 }' | /usr/bin/awk '{print $3}' | /usr/bin/head -n 1)
 downloadURL="https://downloads.1password.com/mac/1Password.pkg"
 FILE=${downloadURL##*/}
-currentVers=$(/usr/bin/curl -s "https://releases.1password.com/mac/" | /usr/bin/xmllint --format --html - 2>/dev/null | /usr/bin/grep -B 7 '<h2 class="c-heading c-heading--2 u-mb-2 u-mb-0@md u-mt-4 u-mt-0@md">1Password for Mac</h2>' | /usr/bin/grep "Updated to" | /usr/bin/awk -F ">" '{ print $2 }' | /usr/bin/awk '{print $3}' | /usr/bin/head -n 1)
 
 # compare version numbers
 if [ "${installedVers}" ]; then
