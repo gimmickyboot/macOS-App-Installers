@@ -178,7 +178,7 @@ apps = [
     App(name="Karabena Elements", app_url="https://github.com/pqrs-org/Karabiner-Elements", file_search_strings=["dmg"], scraper=scrape_github),
     App(name="KeepassXC", app_url="https://github.com/keepassxreboot/keepassxc", file_search_strings=["arm64.dmg"], scraper=scrape_github),
     App(name="LabChart", app_url="https://www.adinstruments.com/support/downloads/mac/labchart", scraper=scrape_labchart),
-    App(name="logi Options+", app_url="https://marketplace.logi.com/releasenotes/optionsplus/en", download_url="https://download01.logi.com/web/ftp/pub/techsupport/optionsplus/logioptionsplus_installer.zip", scraper=scrape_logioptionsplus),
+    App(name="logi Options+", app_url="https://support.logi.com/api/v2/help_center/en-us/articles.json?label_names=webcontent=productdownload,webos=mac-macos-x-26.0", scraper=scrape_logioptionsplus),
     App(name="Logi Tune", app_url="https://support.logi.com/api/v2/help_center/en-us/articles.json?label_names=webcontent=productdownload,webos=mac-macos-x-11.0", scraper=scrape_logitune),
     App(name="LowProfile", app_url="https://github.com/ninxsoft/LowProfile", file_search_strings=[".pkg"], scraper=scrape_github),
     App(name="LuLu", app_url="https://github.com/objective-see/LuLu", file_search_strings=[".dmg"], scraper=scrape_github),

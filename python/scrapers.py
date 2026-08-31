@@ -1319,19 +1319,31 @@ def scrape_logioptionsplus(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    if not app.download_url:
-        raise ValueError("download_url is required")
+    json_data = get_json(app.app_url, session)
 
-    html = get_text(app.app_url, session)
+    html_url = next(
+        article["html_url"]
+        for article in json_data["articles"]
+            if article.get("name") == "Logi Options+"
+    )
+
+    html = get_text(html_url, session)
 
     soup = BeautifulSoup(html, "html.parser")
 
-    span_tag = soup.find('span', string='Latest')
-    version = span_tag.find_previous('a').get_text(strip=True)
+    span_tag = soup.find('span', string=lambda text: text and 'Software Version' in text)
+    li_tag = span_tag.find_parent('li')
+    version = li_tag.contents[-1].strip()
+
     if not version:
         raise ValueError("Could not determine version")
 
-    download_url = app.download_url
+    links = soup.find_all('a', href=True)
+    for link in links:
+        if ".zip" in link['href']:
+            download_url = link['href']
+            break
+
     if not download_url:
         raise ValueError("Could not determine download URL")
 

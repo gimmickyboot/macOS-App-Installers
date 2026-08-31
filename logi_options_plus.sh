@@ -5,8 +5,38 @@ bundleName="logioptionsplus"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-currentVers=$(/usr/bin/curl -s "https://marketplace.logi.com/releasenotes/optionsplus/en" | /usr/bin/xmllint --html --xpath 'string(//span[normalize-space(.)="Latest"]/preceding-sibling::a[1])' - 2>/dev/null)
-downloadURL="https://download01.logi.com/web/ftp/pub/techsupport/optionsplus/logioptionsplus_installer.zip"
+majVers=$(/usr/bin/sw_vers -productVersion | /usr/bin/awk -F "." '{print$1}')
+jSON=$(/usr/bin/curl -s "https://support.logi.com/api/v2/help_center/en-us/articles.json?label_names=webcontent=productdownload,webos=mac-macos-x-${majVers}.0")
+if [ "$(/usr/bin/sw_vers -buildVersion | /usr/bin/cut -c 1-2 -)" -ge 24 ]; then
+  # Mac is Sequioa or later
+  htmlURL=$(printf '%s' "${jSON}"  | /usr/bin/jq -r 'first(.articles[] | select(.name == "Logi Options+") | .html_url)')
+else
+  # Mac is Sonoma or older
+  count=$(
+    printf '%s' "${jSON}" |
+    /usr/bin/plutil -extract articles raw -o - -
+  )
+
+  i=0
+  while [ "$i" -lt "$count" ]; do
+      name=$(
+          printf '%s' "${jSON}" |
+          /usr/bin/plutil -extract "articles.$i.name" raw -o - -
+      )
+      if [ "${name}" = "Logi Options+" ]; then
+          htmlURL=$(
+              printf '%s' "${jSON}" |
+              /usr/bin/plutil -extract "articles.$i.html_url" raw -o - -
+          )
+          break
+      fi
+      i=$((i + 1))
+  done
+fi
+
+htmlData=$(/usr/bin/curl -s "${htmlURL}")
+currentVers=$(printf '%s' "${htmlData}" | /usr/bin/xmllint --html --xpath 'string(//*[@id="vue-article"]/article/section[1]/div[9]/div[1]/div/div/ul/li[1])' - 2>/dev/null | /usr/bin/awk '{print $3}')
+downloadURL=$(printf '%s' "${htmlData}" | /usr/bin/xmllint --html --xpath 'string(//*[@id="vue-article"]/article/section[1]/div[9]/div[1]/div/div/ul/div/a/@href)' - 2>/dev/null)
 FILE=${downloadURL##*/}
 
 # compare version numbers
