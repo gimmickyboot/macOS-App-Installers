@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.22 (31/08/2026)
+# v1.0.23 (02/09/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -1587,7 +1587,7 @@ for theApp in $theList; do
       ;;
 
     vlc)
-      currentVers=$(/usr/bin/curl -s "https://www.videolan.org/vlc/download-macosx.html" | /usr/bin/grep -o "get.videolan.org/vlc/.*/macosx/vlc-.*-universal.dmg" | /usr/bin/cut -d "/" -f -4 - | /usr/bin/awk -F"/" '{print $3}')
+      currentVers=$(/usr/bin/curl -s "https://www.videolan.org/vlc/download-macosx.html" | /usr/bin/grep -o "get.videolan.org/vlc/.*/macosx/vlc-.*-universal.dmg" | /usr/bin/head -n 1 | /usr/bin/cut -d "/" -f -4 - | /usr/bin/awk -F"/" '{print $3}')
       downloadURL="http://get.videolan.org/vlc/${currentVers}/macosx/vlc-${currentVers}-universal.dmg"
       ;;
 
