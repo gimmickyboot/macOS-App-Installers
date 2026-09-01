@@ -5,7 +5,7 @@ bundleName="VLC"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-currentVers=$(/usr/bin/curl -s "https://www.videolan.org/vlc/download-macosx.html" | /usr/bin/grep -o "get.videolan.org/vlc/.*/macosx/vlc-.*-universal.dmg" | /usr/bin/cut -d "/" -f -4 - | /usr/bin/awk -F"/" '{print $3}')
+currentVers=$(/usr/bin/curl -s "https://www.videolan.org/vlc/download-macosx.html" | /usr/bin/grep -o "get.videolan.org/vlc/.*/macosx/vlc-.*-universal.dmg" | /usr/bin/head -n 1 | /usr/bin/cut -d "/" -f -4 - | /usr/bin/awk -F"/" '{print $3}')
 downloadURL="http://get.videolan.org/vlc/${currentVers}/macosx/vlc-${currentVers}-universal.dmg"
 FILE=${downloadURL##*/}
 
