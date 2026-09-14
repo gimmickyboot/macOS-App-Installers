@@ -35,7 +35,7 @@ else
 fi
 
 htmlData=$(/usr/bin/curl -s "${htmlURL}")
-currentVers=$(printf '%s' "${htmlData}" | /usr/bin/xmllint --html --xpath 'string(//*[@id="vue-article"]/article/section[1]/div[9]/div[1]/div/div/ul/li[1])' - 2>/dev/null | /usr/bin/awk '{print $3}')
+currentVers=$(printf '%s' "${htmlData}" | /usr/bin/xmllint --html --xpath 'string(//*[@id="vue-article"]/article/section[1]/div[9]/div[1]/div/div/ul/li[1])' - 2>/dev/null | xargs | /usr/bin/awk '{print $3}')
 downloadURL=$(printf '%s' "${htmlData}" | /usr/bin/xmllint --html --xpath 'string(//*[@id="vue-article"]/article/section[1]/div[9]/div[1]/div/div/ul/div/a/@href)' - 2>/dev/null)
 FILE=${downloadURL##*/}
 
