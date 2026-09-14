@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.23 (02/09/2026)
+# v1.0.24 (14/09/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -813,7 +813,7 @@ for theApp in $theList; do
     logi_options_plus)
       htmlURL=$(/usr/bin/curl -s "https://support.logi.com/api/v2/help_center/en-us/articles.json?label_names=webcontent=productdownload,webos=mac-macos-x-26.0" | /usr/bin/jq -r 'first(.articles[] | select(.name == "Logi Options+") | .html_url)')
       htmlData=$(/usr/bin/curl -s "${htmlURL}")
-      currentVers=$(printf '%s' "${htmlData}" | /usr/bin/xmllint --html --xpath 'string(//*[@id="vue-article"]/article/section[1]/div[9]/div[1]/div/div/ul/li[1])' - 2>/dev/null | /usr/bin/awk '{print $3}')
+      currentVers=$(printf '%s' "${htmlData}" | /usr/bin/xmllint --html --xpath 'string(//*[@id="vue-article"]/article/section[1]/div[9]/div[1]/div/div/ul/li[1])' - 2>/dev/null | xargs | /usr/bin/awk '{print $3}')
       downloadURL=$(printf '%s' "${htmlData}" | /usr/bin/xmllint --html --xpath 'string(//*[@id="vue-article"]/article/section[1]/div[9]/div[1]/div/div/ul/div/a/@href)' - 2>/dev/null)
       ;;
 
