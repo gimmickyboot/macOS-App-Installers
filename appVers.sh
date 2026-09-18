@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.24 (14/09/2026)
+# v1.0.25 (18/09/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -376,7 +376,7 @@ for theApp in $theList; do
       ;;
 
     cycliqplus)
-      URL="https://legacy.cycliq.com"
+      URL="https://cycliq.com"
       if [ "${platformType}" = "Linux" ]; then
         archType="silicon"
       else
