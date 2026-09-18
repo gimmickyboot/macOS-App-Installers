@@ -133,7 +133,7 @@ apps = [
     App(name="CodeRunner", app_url="https://coderunnerapp.com/appcast.xml", sparkle_version_key="shortVersionString", scraper=scrape_sparkle),
     App(name="Codex", app_url="https://persistent.oaistatic.com/codex-app-prod/appcast.xml", scraper=scrape_codex),
     App(name="Cyberduck", app_url="https://version.cyberduck.io/changelog.rss", sparkle_version_key="shortVersionString", scraper=scrape_sparkle),
-    App(name="CycliqPlus", download_url="https://legacy.cycliq.com/software/cycliqplus/macos-silicon/", scraper=scrape_cycliqplus),
+    App(name="CycliqPlus", download_url="https://cycliq.com/software/cycliqplus/macos-silicon/", scraper=scrape_cycliqplus),
     App(name="DisplayLink Manager", app_url="https://www.synaptics.com", scraper=scrape_displaylinkmanager),
     App(name="dockutil", app_url="https://github.com/kcrawford/dockutil", file_search_strings=[".pkg"], scraper=scrape_github),
     App(name="Draw IO", app_url="https://github.com/jgraph/drawio-desktop", file_search_strings=[".dmg", "arm64"], scraper=scrape_github),

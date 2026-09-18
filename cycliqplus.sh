@@ -5,7 +5,7 @@ bundleName="CycliqPlus"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
-URL="https://legacy.cycliq.com"
+URL="https://cycliq.com"
 case $(uname -m) in
   arm64)
     archType="silicon"
