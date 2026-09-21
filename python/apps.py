@@ -248,6 +248,7 @@ apps = [
     App(name="RStudio", app_url="https://docs.posit.co/ide/user/#rstudio-ide-oss-downloads", scraper=scrape_rstudio),
     App(name="SAP Privileges", app_url="https://github.com/SAP/macOS-enterprise-privileges", file_search_strings=[".pkg"], scraper=scrape_github),
     App(name="Sassafras KeyAccess Mac", app_url="https://solutions.teamdynamix.com/TDClient/1965/Portal/KB/Article/169236/Current-ITAM-Downloads", scraper=scrape_sassafraskeyaccessmac),
+    App(name="ScopeMap", app_url="https://github.com/Jamf-Concepts/scope-map", file_search_strings=[".pkg"], scraper=scrape_github),
     App(name="Sequel Pro", app_url="https://github.com/sequelpro/sequelpro", file_search_strings=[".dmg"], scraper=scrape_github),
     App(name="SF Symbols", app_url="https://developer.apple.com/sf-symbols/", scraper=scrape_sfsymbols),
     App(name="shellcheck", app_url="https://github.com/koalaman/shellcheck", file_search_strings=["darwin.aarch64.tar.xz"], scraper=scrape_github),
