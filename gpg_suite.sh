@@ -3,12 +3,12 @@
 appInstallPath="/Library/Application Support/GPGTools"
 bundleName="GPG Tools"
 appName="${bundleName}"
-installedVers=$(/usr/bin/defaults read "${appInstallPath}"/version.plist CFBundleShortVersionString 2>/dev/null)
+installedVers=$(/usr/bin/defaults read "${appInstallPath}"/version.plist BuildNumber 2>/dev/null)
 
 downloadURL=$(/usr/bin/curl -Ls "https://gpgtools.org" | /usr/bin/grep dmg | /usr/bin/xmllint --html --xpath 'string(//a/@href)' - 2>/dev/null)
 currentVers=$(printf '%s' "${downloadURL}"| /usr/bin/cut -d "/" -f 4- - | /usr/bin/grep -oE 'GPG_Suite-[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/GPG_Suite-//')
 FILE=${downloadURL##*/}
-SHAHash=$(/usr/bin/curl -Ls "https://gpgtools.org" | /usr/bin/grep SHA256 | /usr/bin/xmllint --html --xpath '//span[2]/text()' - 2>/dev/null)
+SHAHash=$(/usr/bin/curl -Ls "https://gpgtools.org" | /usr/bin/grep dmg | /usr/bin/xmllint --html --xpath '//code/text()' - 2>/dev/null | /usr/bin/awk '{print $3}')
 
 # compare version numbers
 if [ "${installedVers}" ]; then
