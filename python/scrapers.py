@@ -391,43 +391,47 @@ def scrape_microsoft_plist(session: requests.Session, app: App) -> Result:
     )
 
 
-def scrape_microsoft_edge(session: requests.Session, app: App) -> Result:
+def scrape_microsoft_copilot_app(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
     json_data = get_json(app.app_url, session)
 
     release_match = None
+    pkg_artifact = None
+
     for item in json_data:
         releases = item.get("Releases") or []
 
         for release in releases:
-            if release.get("Platform") == "MacOS":
+            if release.get("Platform") != "MacOS":
+                continue
+
+            artifacts = release.get("Artifacts") or []
+
+            pkg = next(
+                (
+                    artifact
+                    for artifact in artifacts
+                    if artifact.get("ArtifactName") == "pkg"
+                ),
+                None,
+            )
+
+            if pkg:
                 release_match = release
+                pkg_artifact = pkg
                 break
 
         if release_match:
             break
 
-    if not release_match:
-        raise ValueError("Could not find MacOS release")
+    if not release_match or not pkg_artifact:
+        raise ValueError("Could not find MacOS pkg release")
 
     version = release_match.get("ProductVersion")
     if not version:
         raise ValueError("Could not determine version")
-
-    artifacts = release_match.get("Artifacts") or []
-    pkg_artifact = next(
-        (
-            artifact
-            for artifact in artifacts
-            if artifact.get("ArtifactName") == "pkg"
-        ),
-        None
-    )
-
-    if not pkg_artifact:
-        raise ValueError("Could not find pkg artifact")
 
     download_url = pkg_artifact.get("Location")
     if not download_url:
@@ -436,7 +440,59 @@ def scrape_microsoft_edge(session: requests.Session, app: App) -> Result:
     return Result(
         name=app.name,
         version=version,
-        download_url=validate_download_url(download_url, session)
+        download_url=validate_download_url(download_url, session),
+    )
+
+def scrape_microsoft_edge(session: requests.Session, app: App) -> Result:
+    if not app.app_url:
+        raise ValueError("app_url is required")
+
+    json_data = get_json(app.app_url, session)
+
+    release_match = None
+    pkg_artifact = None
+
+    for item in json_data:
+        releases = item.get("Releases") or []
+
+        for release in releases:
+            if release.get("Platform") != "MacOS":
+                continue
+
+            artifacts = release.get("Artifacts") or []
+
+            pkg = next(
+                (
+                    artifact
+                    for artifact in artifacts
+                    if artifact.get("ArtifactName") == "pkg"
+                ),
+                None,
+            )
+
+            if pkg:
+                release_match = release
+                pkg_artifact = pkg
+                break
+
+        if release_match:
+            break
+
+    if not release_match or not pkg_artifact:
+        raise ValueError("Could not find MacOS pkg release")
+
+    version = release_match.get("ProductVersion")
+    if not version:
+        raise ValueError("Could not determine version")
+
+    download_url = pkg_artifact.get("Location")
+    if not download_url:
+        raise ValueError("Could not determine download URL")
+
+    return Result(
+        name=app.name,
+        version=version,
+        download_url=validate_download_url(download_url, session),
     )
 
 
