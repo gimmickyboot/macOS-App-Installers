@@ -6,6 +6,9 @@ appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 majVers=$(/usr/bin/sw_vers -productVersion | /usr/bin/awk -F "." '{print$1}')
+if [ "${majVers}" -gt 26 ]; then
+  majVers="26"
+fi
 jSON=$(/usr/bin/curl -s "https://support.logi.com/api/v2/help_center/en-us/articles.json?label_names=webcontent=productdownload,webos=mac-macos-x-${majVers}.0")
 if [ "$(/usr/bin/sw_vers -buildVersion | /usr/bin/cut -c 1-2 -)" -ge 24 ]; then
   # Mac is Sequioa or later
