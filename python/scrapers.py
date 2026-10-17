@@ -1275,34 +1275,6 @@ def scrape_openvpnconnect(session: requests.Session, app: App) -> Result:
 
 def scrape_opera(session: requests.Session, app: App) -> Result:
     if not app.app_url:
-        raise ValueError("download_url is required")
-
-    link_one = get_redirect_url(app.app_url, session)
-
-    html = get_text(link_one, session)
-
-    soup = BeautifulSoup(html, "html.parser")
-
-    tag = soup.find('a', {'data-event-action': 'thanks-download-link-default'})
-    download_url_tmp = tag.get('href')
-    download_url = get_redirect_url(download_url_tmp, session)
-    if not download_url:
-        raise ValueError("Could not find download_url")
-
-    parts = download_url.split("/")
-    version = parts[7]
-    if not version:
-        raise ValueError("Could not find version")
-
-    return Result(
-        name=app.name,
-        version=version,
-        download_url=validate_download_url(download_url, session)
-    )
-
-
-def scrape_opera_air(session: requests.Session, app: App) -> Result:
-    if not app.app_url:
         raise ValueError("app_url is required")
 
     soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
@@ -1318,39 +1290,7 @@ def scrape_opera_air(session: requests.Session, app: App) -> Result:
             continue
 
     if not versions:
-        raise ValueError("Could not determine Opera Air version")
-    _, version = max(versions)
-
-    if not app.download_url_template:
-        raise ValueError("download_url_template is required")
-
-    download_url = app.download_url_template.format(version=version)
-
-    return Result(
-        name=app.name,
-        version=version,
-        download_url=download_url
-    )
-
-
-def scrape_opera_gx(session: requests.Session, app: App) -> Result:
-    if not app.app_url:
-        raise ValueError("app_url is required")
-
-    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
-
-    versions = []
-
-    for link in soup.find_all("a", href=True):
-        href = link["href"].rstrip("/")
-        try:
-            version = Version(href)
-            versions.append((version, href))
-        except ValueError:
-            continue
-
-    if not versions:
-        raise ValueError("Could not determine Opera GX version")
+        raise ValueError(f"Could not determine {app.name} version")
     _, version = max(versions)
 
     if not app.download_url_template:
