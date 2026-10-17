@@ -6,8 +6,17 @@ appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null)
 
 xmlData=$(/usr/bin/curl -s https://s3.amazonaws.com/itsycal/itsycal.xml)
-currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath '//rss/channel/item/title/text()' - | /usr/bin/awk '{print $2}')
-downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath '//rss/channel/item/enclosure/@url' - | /usr/bin/cut -d \" -f 2 -)
+macOSVers=$(/usr/bin/sw_vers -productVersion)
+macOSMajor=${macOSVers%%.*}
+
+if [ "${macOSMajor}" -ge 27 ]; then
+    releaseItem=1
+else
+    releaseItem=2
+fi
+
+currentVers=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath "string((//rss/channel/item)[${releaseItem}]/title)" - | /usr/bin/awk '{print $2}')
+downloadURL=$(printf '%s' "${xmlData}" | /usr/bin/xmllint --xpath "string((//rss/channel/item)[${releaseItem}]/enclosure/@url)" -)
 FILE=${downloadURL##*/}
 
 # compare version numbers
