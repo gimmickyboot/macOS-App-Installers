@@ -268,7 +268,7 @@ apps = [
     App(name="Sublime Merge", app_url="https://www.sublimemerge.com/updates/stable_update_check", download_url_template="https://download.sublimetext.com/sublime_merge_build_{version}_mac.zip", scraper=scrape_sublime),
     App(name="Sublime Text", app_url="https://www.sublimetext.com/updates/4/stable_update_check", download_url_template="https://download.sublimetext.com/sublime_text_build_{version}_mac.zip", scraper=scrape_sublime),
     App(name="SupportApp", app_url="https://github.com/root3nl/SupportApp", file_search_strings=[".pkg"], scraper=scrape_github),
-    App(name="Suspicous Package", app_url="https://www.mothersruin.com/software", scraper=scrape_suspiciouspackage),
+    App(name="Suspicious Package", app_url="https://www.mothersruin.com/software", scraper=scrape_suspiciouspackage),
     App(name="SwiftDialog", app_url="https://github.com/swiftDialog/swiftDialog", file_search_strings=[".pkg"], scraper=scrape_github),
     App(name="TeamViewer", app_url="https://download.teamviewer.com/download/update/macupdates.xml?version=15.1.1&os=macos&osversion=26.5.1", sparkle_version_key="version", scraper=scrape_sparkle),
     App(name="TeamViewerQS", app_url="https://www.teamviewer.com/en-au/solutions/use-cases/quicksupport/", scraper=scrape_teamviewerqs),
