@@ -1301,6 +1301,37 @@ def scrape_opera(session: requests.Session, app: App) -> Result:
     )
 
 
+def scrape_opera_air(session: requests.Session, app: App) -> Result:
+    if not app.app_url:
+        raise ValueError("app_url is required")
+
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
+
+    versions = []
+
+    for link in soup.find_all("a", href=True):
+        href = link["href"].rstrip("/")
+        try:
+            version = Version(href)
+            versions.append((version, href))
+        except ValueError:
+            continue
+
+    if not versions:
+        raise ValueError("Could not determine Opera Air version")
+    _, version = max(versions)
+
+    if not app.download_url_template:
+        raise ValueError("download_url_template is required")
+
+    download_url = app.download_url_template.format(version=version)
+
+    return Result(
+        name=app.name,
+        version=version,
+        download_url=download_url
+    )
+
 def scrape_githubdesktop(session: requests.Session, app: App) -> Result:
     if not app.download_url:
         raise ValueError("download_url is required")
