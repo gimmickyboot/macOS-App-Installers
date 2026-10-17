@@ -26,13 +26,21 @@ if [ -n "${installedVers}" ]; then
 
     # Remove the component just compared
     case "$v1" in
-      *.*) v1=${v1#*.} ;;
-      *)   v1= ;;
+      *.*)
+        v1=${v1#*.}
+        ;;
+      *)
+        v1=
+        ;;
     esac
 
     case "$v2" in
-      *.*) v2=${v2#*.} ;;
-      *)   v2= ;;
+      *.*)
+        v2=${v2#*.}
+        ;;
+      *)
+        v2=
+        ;;
     esac
 
     # Treat missing components as zero
