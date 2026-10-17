@@ -7,7 +7,6 @@ installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/C
 
 
 currentVers=$(/usr/bin/curl -s "https://download3.operacdn.com/pub/opera_air/" | /usr/bin/sed -n 's|.*href="\([0-9][0-9.]*\)/".*|\1|p' | /usr/bin/sort -V | /usr/bin/tail -1)
-downloadURL="https://download3.operacdn.com/ftp/pub/opera_air/${currentVers}/mac/Opera_Air_${currentVers}_Autoupdate_arm64.tar.xz"
 case $(uname -m) in
   arm64)
     downloadURL="https://download3.operacdn.com/ftp/pub/opera_air/${currentVers}/mac/Opera_Air_${currentVers}_Autoupdate_arm64.tar.xz"
