@@ -4,7 +4,7 @@
 # appVers.sh - script to retrieve current versions and download URLs for monitored apps
 # Mac Guy https://github.com/gimmickyboot
 #
-# v1.0.29 (17/10/2026)
+# v1.0.30 (17/10/2026)
 ###################
 
 ## uncomment the next line to output debugging to stdout
@@ -1109,10 +1109,8 @@ for theApp in $theList; do
       ;;
 
     opera)
-      linkOne=$(/usr/bin/curl -sI "https://download.opera.com/download/get/?partner=www&opsys=MacOS" | /usr/bin/grep -i "^location" | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//')
-      linkTwo=$(/usr/bin/curl -sL "${linkOne}" | /usr/bin/grep "thanks-download-link" | /usr/bin/xmllint --html --xpath 'string(//html/body/p/a/@href)' - 2>/dev/null | /usr/bin/sed 's/\&amp;/\&/g')
-      downloadURL=$(/usr/bin/curl -sI "${linkTwo}" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//')
-      currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/grep -oE 'desktop/[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/desktop\///g')
+      currentVers=$(/usr/bin/curl -s "https://download3.operacdn.com/pub/opera/desktop/" | /usr/bin/sed -n 's|.*href="\([0-9][0-9.]*\)/".*|\1|p' | /usr/bin/sort -V | /usr/bin/tail -1)
+      downloadURL="https://download3.operacdn.com/pub/opera/desktop/${currentVers}/mac/Opera_${currentVers}_Autoupdate_arm64.tar.xz"
       ;;
 
     opera_air)
