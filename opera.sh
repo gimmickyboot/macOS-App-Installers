@@ -5,10 +5,24 @@ bundleName="Opera"
 appName="${bundleName}"
 installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleVersion 2>/dev/null)
 
-linkOne=$(/usr/bin/curl -sI "https://download.opera.com/download/get/?partner=www&opsys=MacOS" | /usr/bin/grep -i "^location" | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//')
-linkTwo=$(/usr/bin/curl -sL "${linkOne}" | /usr/bin/grep "thanks-download-link" | /usr/bin/xmllint --html --xpath 'string(//html/body/p/a/@href)' - 2>/dev/null | /usr/bin/sed 's/\&amp;/\&/g')
-downloadURL=$(/usr/bin/curl -sI "${linkTwo}" | /usr/bin/grep -i ^location | /usr/bin/awk '{print $2}' | /usr/bin/sed 's/\r//')
-currentVers=$(printf '%s' "${downloadURL}" | /usr/bin/grep -oE 'desktop/[0-9]+(\.[0-9]+)*' | /usr/bin/sed 's/desktop\///g')
+
+currentVers=$(/usr/bin/curl -s "https://download3.operacdn.com/pub/opera/desktop/" | /usr/bin/sed -n 's|.*href="\([0-9][0-9.]*\)/".*|\1|p' | /usr/bin/sort -V | /usr/bin/tail -1)
+case $(uname -m) in
+  arm64)
+    downloadURL="https://download3.operacdn.com/pub/opera/desktop/${currentVers}/mac/Opera_${currentVers}_Autoupdate_arm64.tar.xz"
+    SHAHash=$(/usr/bin/curl -s "https://download3.operacdn.com/pub/opera/desktop/${currentVers}/mac/Opera_${currentVers}_Autoupdate_arm64.tar.xz.sha256sum")
+    ;;
+
+  x86_64)
+    downloadURL="https://download3.operacdn.com/pub/opera/desktop/${currentVers}/mac/Opera_${currentVers}_Autoupdate.tar.xz"
+    SHAHash=$(/usr/bin/curl -s "https://download3.operacdn.com/pub/opera/desktop/${currentVers}/mac/Opera_${currentVers}_Autoupdate.tar.xz.sha256sum")
+    ;;
+
+  *)
+    printf '%s\n' "Unknown architecture. Exiting"
+    exit 1
+    ;;
+esac
 FILE=${downloadURL##*/}
 
 # compare version numbers
@@ -37,14 +51,26 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
+  SHAResult=$(printf '%s' "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  case "${SHAResult}" in
+    *OK)
+      printf '%s\n' "SHA hash has successfully verifed."
+      ;;
+
+    *FAILED)
+      printf '%s\n' "SHA hash has failed verification"
+      exit 1
+      ;;
+
+    *)
+      printf '%s\n' "An unknown error has occured."
+      exit 1
+      ;;
+  esac
   /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
-  TMPDIR=$(mktemp -d)
-  /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
-  /usr/bin/ditto "${TMPDIR}"/"${bundleName}.app" "${appInstallPath}"/"${bundleName}.app"
+  /usr/bin/tar -xf /tmp/${FILE} -C "${appInstallPath}"/
   /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
   /usr/sbin/chown -R root:admin "${appInstallPath}"/"${bundleName}.app"
   /bin/chmod -R 755 "${appInstallPath}"/"${bundleName}.app"
-  /usr/bin/hdiutil eject "${TMPDIR}" -quiet
-  /bin/rmdir "${TMPDIR}"
   /bin/rm /tmp/"${FILE}"
 fi
