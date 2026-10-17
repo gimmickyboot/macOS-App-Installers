@@ -73,9 +73,10 @@ def scrape_sparkle(session: requests.Session, app: App) -> Result:
 
 
 def scrape_onepassword(session: requests.Session, app: App) -> Result:
-    html = get_text(app.app_url, session)
+    if not app.app_url:
+        raise ValueError("app_url is required")
 
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     content = soup.find("div", class_="u-flexgrow u-text-left")
     if not content:
@@ -127,9 +128,7 @@ def scrape_androidstudio(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     download_url_raw = soup.find('a', href=re.compile(r'mac_arm\.dmg', re.IGNORECASE))
     download_url = download_url_raw['href']
@@ -156,9 +155,7 @@ def scrape_atext(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     pattern = re.compile(r'Version\s+(\d+(?:\.\d+)*).*macOS', re.IGNORECASE)
     versions = [
@@ -191,9 +188,7 @@ def scrape_avidlink(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     script_tag = soup.find("script", type="application/json")
     if script_tag:
@@ -243,9 +238,7 @@ def scrape_awscli(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    version = extract_version(html)
+    version = extract_version(get_text(app.app_url, session))
     if not version:
         raise ValueError("Could not determine version")
 
@@ -262,9 +255,7 @@ def scrape_blender(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     download_url = get_href_link(soup, "macos-arm64.dmg").strip('/')
 
@@ -287,9 +278,7 @@ def scrape_bbedit(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     download_url = get_href_link(soup, ".dmg")
     file_name = filename_from_url(download_url)
@@ -311,8 +300,9 @@ def scrape_github(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    latest_release_html = get_text(f"{app.app_url}/releases/latest", session)
-    latest_release_soup = BeautifulSoup(latest_release_html, "html.parser")
+    # latest_release_html = get_text(f"{app.app_url}/releases/latest", session)
+    latest_release_soup = BeautifulSoup(get_text(f"{app.app_url}/releases/latest",
+        session), "html.parser")
 
     release_tag_url_results = latest_release_soup.find("meta", attrs={"name": "apple-itunes-app"})
     if not release_tag_url_results:
@@ -330,8 +320,8 @@ def scrape_github(session: requests.Session, app: App) -> Result:
     if not tag:
         raise ValueError("Could not determine release tag")
 
-    download_url_html = get_text(f"{app.app_url}/releases/expanded_assets/{tag}", session)
-    download_soup = BeautifulSoup(download_url_html, "html.parser")
+    download_soup = BeautifulSoup(get_text(f"{app.app_url}/releases/expanded_assets/{tag}",
+        session), "html.parser")
     download_url_raw = None
 
     for link in download_soup.find_all("a", href=True):
@@ -533,9 +523,7 @@ def scrape_affinity(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     version_string_text = soup.find(string=re.compile(r"Download version"))
     version_string_raw = str(version_string_text).strip()
@@ -563,9 +551,7 @@ def scrape_mysqlworkbench(session: requests.Session, app: App) -> Result:
     else:
         header = {"User-Agent": cfg.USER_AGENT}
 
-    html = get_text(app.app_url, session, headers=header)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session, headers=header), "html.parser")
 
     h1_tag = soup.find(lambda tag: tag.name == "h1" and "MySQL Workbench" in tag.text.strip())
     version = re.sub(r"[^0-9.]", "", h1_tag.text)
@@ -592,9 +578,7 @@ def scrape_charlesproxy(session: requests.Session, app: App) -> Result:
     if not app.download_url_template:
         raise ValueError("download_url_template is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     strong_tag = soup.find("strong", string="Download a free trial")
     parent_tag = strong_tag.parent
@@ -618,9 +602,7 @@ def scrape_isadora(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     target_div = soup.find('div', string=re.compile("Read the Isadora"))
     text = target_div.get_text(strip=True)
@@ -628,9 +610,7 @@ def scrape_isadora(session: requests.Session, app: App) -> Result:
     if not version:
         raise ValueError("Could not extract version")
 
-    html = get_text(app.download_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.download_url, session), "html.parser")
 
     download_url_tmp = get_href_link(soup, "-std.dmg").lstrip("./")
     netloc = urlparse(app.download_url).netloc
@@ -649,9 +629,7 @@ def scrape_labchart(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     h_tag = soup.find(name=lambda tag: tag.name == 'h1' and "LabChart" in tag.get_text())
     version_raw = h_tag.get_text(strip=True)
@@ -674,9 +652,7 @@ def scrape_googleearthpro(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     download_url = get_href_link(soup, "googleearthpromac")
     file_name = filename_from_url(download_url)
@@ -698,9 +674,7 @@ def scrape_gpgtools(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     download_url = get_href_link(soup, ".dmg")
     file_name = filename_from_url(download_url)
@@ -722,9 +696,7 @@ def scrape_python(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     download_url = get_href_link(soup, ".pkg")
     parts = download_url.split("/")
@@ -746,9 +718,7 @@ def scrape_r(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     for a_tag in soup.find_all('a', string=re.compile('arm64.pkg')):
         download_url_raw = a_tag.get('href')
@@ -1328,9 +1298,7 @@ def scrape_sassafraskeyaccessmac(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     strong_tag = soup.find('strong', string=re.compile(r"Minor Version", re.IGNORECASE))
     if strong_tag:
@@ -1355,9 +1323,7 @@ def scrape_mafft(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(f"{app.app_url}/macstandard.html", session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(f"{app.app_url}/macstandard.html", session), "html.parser")
 
     download_url_raw = get_href_link(soup, "signed.pkg")
     download_url = f"{app.app_url}/{download_url_raw}"
@@ -1387,9 +1353,7 @@ def scrape_logioptionsplus(session: requests.Session, app: App) -> Result:
             if article.get("name") == "Logi Options+"
     )
 
-    html = get_text(html_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(html_url, session), "html.parser")
 
     span_tag = soup.find('span', string=lambda text: text and 'Software Version' in text)
     li_tag = span_tag.find_parent('li')
@@ -1418,9 +1382,7 @@ def scrape_makemkv(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(f"{app.app_url}/download/", session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(f"{app.app_url}/download/", session), "html.parser")
 
     for a_tag in soup.find_all('a', href=True):
         href = a_tag['href']
@@ -1448,9 +1410,8 @@ def scrape_displaylinkmanager(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(f"{app.app_url}/products/displaylink-graphics/downloads/macos", session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(f"{app.app_url}/products/displaylink-graphics/downloads/macos",
+        session), "html.parser")
 
     p_tag = soup.find(lambda tag: tag.name == "p" and "Release:" in tag.text)
     version_raw = p_tag.get_text(strip=True)
@@ -1477,9 +1438,7 @@ def scrape_mestrenova(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(f"{app.app_url}/download", session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(f"{app.app_url}/download", session), "html.parser")
 
     download_url_raw = get_href_link(soup, ".dmg")
     download_url = f"{app.app_url}{download_url_raw}"
@@ -1501,9 +1460,7 @@ def scrape_mp4joiner(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(f"{app.app_url}", session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(f"{app.app_url}", session), "html.parser")
 
     tag = soup.find(string=re.compile("MacOSX.dmg")).parent
     version_raw = tag.get_text(strip=True)
@@ -1560,9 +1517,7 @@ def scrape_sfsymbols(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     all_anchor_tags = soup.find_all('a', href=True)
     dmg_links = []
@@ -1623,8 +1578,7 @@ def scrape_pymol(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     dmg_links = [
         a["href"]
@@ -1743,9 +1697,7 @@ def scrape_suspiciouspackage(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(f"{app.app_url}/SuspiciousPackage/update.html", session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(f"{app.app_url}/SuspiciousPackage/update.html", session), "html.parser")
 
     text = soup.find('td', class_="version")
     version_raw = text.get_text(strip=True)
@@ -1771,9 +1723,7 @@ def scrape_coconutbattery(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     a_tag = soup.find(name=lambda tag: tag.name == 'a' and "Download v" in tag.get_text())
     version_raw = a_tag.get_text(strip=True)
@@ -1862,9 +1812,7 @@ def scrape_fetch(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(f"{app.app_url}/fetch/download", session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(f"{app.app_url}/fetch/download", session), "html.parser")
 
     download_url_raw = get_href_link(soup, ".zip")
     download_url = f"{app.app_url}{download_url_raw}"
@@ -1917,9 +1865,7 @@ def scrape_freemind(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     tag = soup.find('p', string=lambda text: text and 'stable release' in text.lower())
     text = tag.get_text(strip=True)
@@ -1941,9 +1887,7 @@ def scrape_gimp(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     p_tag = soup.find(lambda tag: tag.name == "p" and "The current stable release of GIMP is" in tag.get_text())
     version_raw = p_tag.get_text()
@@ -1965,9 +1909,7 @@ def scrape_pgadmin4(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     v_tags = [
         tag
@@ -2046,8 +1988,7 @@ def scrape_teamviewerqs(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     button = soup.find('custom-button', attrs={'text': 'Download for Mac'})
     target_div = button.find_parent('div', class_='cmp-smartdownloadbutton__wrapper')
@@ -2076,9 +2017,7 @@ def scrape_telegram(session: requests.Session, app: App) -> Result:
     if not app.download_url:
         raise ValueError("download_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     h3_tag = soup.find("h3")
     version = h3_tag.contents[1].strip()
@@ -2096,9 +2035,7 @@ def scrape_theunarchiver(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     text = soup.find('div', class_="latest-version")
     version_raw = text.get_text(strip=True)
@@ -2145,9 +2082,7 @@ def scrape_touchdesigner(session: requests.Session, app: App) -> Result:
     if not app.download_url_template:
         raise ValueError("download_url_template is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     version_raw = soup.find('span', class_="build-number")
     if not version_raw:
@@ -2189,9 +2124,7 @@ def scrape_vlc(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     version_raw = soup.find('span', id="downloadVersion")
     version = version_raw.get_text(strip=True)
@@ -2214,9 +2147,7 @@ def scrape_nvivo(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     span = soup.find("span", string="NVivo Mac")
     class_text = span.get("class")
@@ -2241,9 +2172,7 @@ def scrape_voodoopad(session: requests.Session, app: App) -> Result:
     if not app.download_url_template:
         raise ValueError("download_url_template is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     text = soup.find('p', class_="latest-version")
     version_raw = text.get_text(strip=True)
@@ -2377,9 +2306,7 @@ def scrape_zotero(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     scripts = soup.find_all('script')
     for script in scripts:
@@ -2433,9 +2360,7 @@ def scrape_rstudio(session: requests.Session, app: App) -> Result:
     if not app.app_url:
         raise ValueError("app_url is required")
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     links = soup.find_all('a', href=True)
     for link in links:
@@ -2486,9 +2411,7 @@ def scrape_dotnet(session: requests.Session, app: App) -> Result:
     url_scheme = urlsplit(app.app_url).scheme
     url_netloc = urlsplit(app.app_url).netloc
 
-    html = get_text(app.app_url, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
     h3_tag_with_sdk = soup.find_all('h3', id=re.compile(r'^sdk'))
     version_raw = h3_tag_with_sdk[0].get_text(strip=True)
@@ -2501,9 +2424,7 @@ def scrape_dotnet(session: requests.Session, app: App) -> Result:
         if f"sdk-{version}-macos-x64-installer" in link['href']:
             download_url_tmp = f"{url_scheme}://{url_netloc}{link['href']}"
 
-    html = get_text(download_url_tmp, session)
-
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(get_text(download_url_tmp, session), "html.parser")
 
     links = soup.find_all('a', href=True)
     for link in links:
