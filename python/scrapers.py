@@ -1301,7 +1301,7 @@ def scrape_opera(session: requests.Session, app: App) -> Result:
     return Result(
         name=app.name,
         version=version,
-        download_url=download_url
+        download_url=validate_download_url(download_url, session)
     )
 
 
