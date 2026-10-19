@@ -169,6 +169,7 @@ apps = [
     App(name="Isadora", app_url="https://support.troikatronix.com/support/solutions/folders/5000277523", download_url="https://troikatronix.com/get-it/", scraper=scrape_isadora),
     App(name="itsycal", app_url="https://s3.amazonaws.com/itsycal/itsycal.xml", scraper=scrape_itsycal),
     App(name="Jamf Compliance Editor", app_url="https://github.com/Jamf-Concepts/jamf-compliance-editor", file_search_strings=[".pkg"], scraper=scrape_github),
+    App(name="Jamf Connect Monitor", app_url="https://github.com/macjediwizard/jamf-connect-monitor", file_search_strings=[".pkg"], scraper=scrape_github),
     App(name="Jamf Printer Manager", app_url="https://github.com/jamf/jamf-printer-manager", file_search_strings=[".zip"], scraper=scrape_github),
     App(name="Jamf Replicator", app_url="https://github.com/jamf/Replicator", file_search_strings=[".zip"], scraper=scrape_github),
     App(name="Jamf Sync", app_url="https://github.com/jamf/JamfSync", file_search_strings=[".zip"], scraper=scrape_github),
