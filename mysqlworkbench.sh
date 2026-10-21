@@ -1,9 +1,16 @@
 #!/bin/sh
 
 appInstallPath="/Applications"
-bundleName="MySQLWorkbench"
+bundleName="MySQL Workbench"
+oldBundleName="MySQLWorkbench"
 appName="${bundleName}"
-installedVers=$(/usr/bin/defaults read "${appInstallPath}"/"${bundleName}.app"/Contents/Info.plist CFBundleShortVersionString 2>/dev/null | /usr/bin/sed 's/\.CE$//')
+
+for name in "${bundleName}" "${oldBundleName}"; do
+  if [ -d "${appInstallPath}/${name}.app" ]; then
+    installedVers=$(/usr/bin/defaults read "${appInstallPath}/${name}.app/Contents/Info.plist" CFBundleShortVersionString 2>/dev/null | /usr/bin/sed 's/\.CE$//')
+    break
+  fi
+done
 
 currentVers=$(/usr/bin/curl -fsL "https://dev.mysql.com/downloads/workbench/?os=33" | /usr/bin/grep -A1 "DMG Archive" | /usr/bin/tail -n 1 | /usr/bin/awk -F'[<>]' '{print $3}')
 case $(uname -m) in
@@ -20,7 +27,7 @@ case $(uname -m) in
     exit 1
     ;;
 esac
-downloadURL="https://cdn.mysql.com//Downloads/MySQLGUITools/$(/usr/bin/curl -fsL "https://dev.mysql.com/downloads/workbench/?os=33" | /usr/bin/grep -o "mysql-workbench-community-.*-macos-${archType}.dmg" | /usr/bin/head -n1)"
+downloadURL="https://cdn.mysql.com//Downloads/MySQLGUITools/$(/usr/bin/curl -fsL "https://dev.mysql.com/downloads/workbench/?os=33" | /usr/bin/grep -o "mysql-workbench-.*-macos-${archType}.dmg" | /usr/bin/head -n1)"
 FILE=${downloadURL##*/}
 MD5Hash=$(/usr/bin/curl -fsL "https://dev.mysql.com/downloads/workbench/?os=33" | /usr/bin/grep -A3 "${FILE}" | /usr/bin/grep MD5 | /usr/bin/awk -F'[<>]' '{print $3}')
 
@@ -99,9 +106,21 @@ if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL
       exit 1
       ;;
   esac
-  /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
   TMPDIR=$(mktemp -d)
-  /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
+  if ! /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"; then
+    printf '%s\n' "Failed to mount ${FILE}"
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
+  if [ ! -d "${TMPDIR}/${bundleName}.app" ]; then
+    printf '%s\n' "Could not find ${bundleName}.app in mounted DMG"
+    /usr/bin/hdiutil detach "${TMPDIR}" -quiet
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
+  /bin/rm -rf "${appInstallPath}/${bundleName}.app" "${appInstallPath}/${oldBundleName}.app" >/dev/null 2>&1
   /usr/bin/ditto "${TMPDIR}"/"${bundleName}.app" "${appInstallPath}"/"${bundleName}.app"
   /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
   /usr/sbin/chown -R root:admin "${appInstallPath}"/"${bundleName}.app"
