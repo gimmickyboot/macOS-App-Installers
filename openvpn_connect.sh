@@ -85,8 +85,17 @@ if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL
       exit 1
       ;;
   esac
+  # TMPDIR=$(mktemp -d)
+  # /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
+
   TMPDIR=$(mktemp -d)
-  /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
+  if ! /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"; then
+    printf '%s\n' "Failed to mount ${FILE}"
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
+
   case $(uname -m) in
     arm64)
       archType="arm64"
@@ -101,7 +110,21 @@ if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL
       exit 1
       ;;
   esac
-  /usr/bin/find "${TMPDIR}" -name "*${archType}*.pkg" -exec installer -pkg {} -target / \;
+  pkgPath=$(/usr/bin/find "${TMPDIR}" -name "*${archType}*.pkg" -print -quit)
+  if [ -z "${pkgPath}" ]; then
+    printf '%s\n' "Could not find a PKG in mounted DMG"
+    /usr/bin/hdiutil detach "${TMPDIR}" -quiet
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
+  if ! /usr/sbin/installer -pkg "${pkgPath}" -target /; then
+    printf '%s\n' "Failed to install ${pkgPath}"
+    /usr/bin/hdiutil detach "${TMPDIR}" -quiet
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
   /usr/bin/hdiutil eject "${TMPDIR}" -quiet
   /bin/rmdir "${TMPDIR}"
   /bin/rm /tmp/"${FILE}"

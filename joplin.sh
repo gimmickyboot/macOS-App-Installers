@@ -102,13 +102,9 @@ if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL
       ;;
   esac
   /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
-  TMPDIR=$(mktemp -d)
-  /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
   /usr/bin/ditto -xk /tmp/"${FILE}" "${appInstallPath}"/.
   /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
   /usr/sbin/chown -R root:admin "${appInstallPath}"/"${bundleName}.app"
   /bin/chmod -R 755 "${appInstallPath}"/"${bundleName}.app"
-  /usr/bin/hdiutil eject "${TMPDIR}" -quiet
-  /bin/rmdir "${TMPDIR}"
   /bin/rm /tmp/"${FILE}"
 fi

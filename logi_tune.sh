@@ -72,7 +72,19 @@ fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
   TMPDIR=$(mktemp -d)
-  /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
+  if ! /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"; then
+    printf '%s\n' "Failed to mount ${FILE}"
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
+  if [ ! -f "${TMPDIR}"/LogiTuneInstaller.app/Contents/Resources/Applications/LogiTune.tgz ]; then
+    printf '%s\n' "Could not find LogiTune.tgz in mounted DMG"
+    /usr/bin/hdiutil detach "${TMPDIR}" -quiet
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
   /usr/bin/tar zxf "${TMPDIR}"/LogiTuneInstaller.app/Contents/Resources/Applications/LogiTune.tgz -C "${appInstallPath}"/
   /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
   /usr/sbin/chown -R root:admin "${appInstallPath}"/"${bundleName}.app"

@@ -76,7 +76,20 @@ fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
   TMPDIR=$(mktemp -d)
-  /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
+  if ! /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"; then
+    printf '%s\n' "Failed to mount ${FILE}"
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
+  if [ ! -d "${TMPDIR}/${bundleName}.app" ]; then
+    printf '%s\n' "Could not find ${bundleName}.app in mounted DMG"
+    /usr/bin/hdiutil detach "${TMPDIR}" -quiet
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
+  /bin/rm -rf ${appInstallPath}/"${bundleName}.app" >/dev/null 2>&1
   /usr/bin/ditto "${TMPDIR}"/"${bundleName}.app" "${appInstallPath}"/"${bundleName}.app"
   /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
   /usr/sbin/chown -R root:admin "${appInstallPath}"/"${bundleName}.app"

@@ -75,10 +75,31 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
   TMPDIR=$(mktemp -d)
-  /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
-  /usr/bin/find "${TMPDIR}" -name "*.pkg" -exec installer -pkg {} -target / \;
+  if ! /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"; then
+    printf '%s\n' "Failed to mount ${FILE}"
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
+
+pkgPath=$(/usr/bin/find "${TMPDIR}" -name "*.pkg" -print -quit)
+
+  if [ -z "${pkgPath}" ]; then
+    printf '%s\n' "Could not find a PKG in mounted DMG"
+    /usr/bin/hdiutil detach "${TMPDIR}" -quiet
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
+  /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
+  if ! /usr/sbin/installer -pkg "${pkgPath}" -target /; then
+    printf '%s\n' "Failed to install ${pkgPath}"
+    /usr/bin/hdiutil detach "${TMPDIR}" -quiet
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
   /usr/bin/hdiutil eject "${TMPDIR}" -quiet
   /bin/rmdir "${TMPDIR}"
   /bin/rm /tmp/"${FILE}"

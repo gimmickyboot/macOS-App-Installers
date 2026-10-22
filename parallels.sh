@@ -79,9 +79,21 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
   TMPDIR=$(mktemp -d)
-  /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
+  if ! /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"; then
+    printf '%s\n' "Failed to mount ${FILE}"
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
+  if [ -f "${TMPDIR}"/"${bundleName}.app"/Contents/MacOS/inittool ]; then
+    printf '%s\n' "Could not find a inittool in mounted DMG"
+    /usr/bin/hdiutil detach "${TMPDIR}" -quiet
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
+  /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
   "${TMPDIR}"/"${bundleName}.app"/Contents/MacOS/inittool install -t "${appInstallPath}"/"${bundleName}.app"
   /usr/bin/hdiutil eject "${TMPDIR}" -quiet
   /bin/rmdir "${TMPDIR}"

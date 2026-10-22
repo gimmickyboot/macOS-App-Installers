@@ -68,10 +68,23 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
-  /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
   TMPDIR=$(mktemp -d)
-  /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"
-  /usr/bin/find "${TMPDIR}" -name "EndNote.zip" -exec /usr/bin/ditto -xk {} /tmp/. \; 2>/dev/null
+  if ! /usr/bin/hdiutil attach /tmp/"${FILE}" -noverify -quiet -nobrowse -mountpoint "${TMPDIR}"; then
+    printf '%s\n' "Failed to mount ${FILE}"
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
+  filePath=$(/usr/bin/find "${TMPDIR}" -name "EndNote.zip" -print -quit)
+  if [ -z "${filePath}" ]; then
+    printf '%s\n' "Could not find a PKG in mounted DMG"
+    /usr/bin/hdiutil detach "${TMPDIR}" -quiet
+    /bin/rmdir "${TMPDIR}"
+    /bin/rm /tmp/"${FILE}"
+    exit 1
+  fi
+  /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
+  /usr/bin/ditto -xk "${filePath}" /tmp/. \; 2>/dev/null
   /bin/mv /tmp/EndNote "${appInstallPath}"
   /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
   /usr/sbin/chown -R root:admin "${appInstallPath}"
