@@ -140,10 +140,13 @@ def validate_download_url(
         response = session.head(
             url,
             timeout=timeout,
-            allow_redirects=True,
+            allow_redirects=False,
         )
 
-        return url if response.ok else "ERROR"
+        if response.status_code in (200, 301, 302, 303, 307, 308):
+            return url
+
+        return "ERROR"
 
     except requests.RequestException:
         return "ERROR"
