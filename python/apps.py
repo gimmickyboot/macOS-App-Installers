@@ -221,6 +221,7 @@ apps = [
     App(name="OBS Studio", app_url="https://github.com/obsproject/obs-studio", file_search_strings=["Apple.dmg"], scraper=scrape_github),
     App(name="Obsidian", app_url="https://obsidian.md/changelog.xml", download_url_template="https://github.com/obsidianmd/obsidian-releases/releases/download/v{version}/Obsidian-{version}.dmg", scraper=scrape_obsidian),
     App(name="Okta Verify", app_url="https://integrator-1080591-admin.okta.com/api/v1/artifacts/OKTA_VERIFY_MACOS/latest?releaseChannel=GA", scraper=scrape_oktaverify),
+    App(name="OpenShot", app_url="https://github.com/OpenShot/openshot-qt", file_search_strings=["x86_64.dmg"], scraper=scrape_github),
     App(name="OpenVPN Connect", download_url="https://openvpn.net/downloads/openvpn-connect-v3-macos.dmg", scraper=scrape_openvpnconnect),
     App(name="Opera", app_url="https://download3.operacdn.com/pub/opera/desktop/", download_url_template="https://download3.operacdn.com/pub/opera/desktop/{version}/mac/Opera_{version}_Autoupdate_arm64.tar.xz", scraper=scrape_opera),
     App(name="Opera Air", app_url="https://download3.operacdn.com/pub/opera_air/", download_url_template="https://download3.operacdn.com/ftp/pub/opera_air/{version}/mac/Opera_Air_{version}_Autoupdate_arm64.tar.xz", scraper=scrape_opera),
