@@ -253,7 +253,7 @@ apps = [
     App(name="QLab", app_url="https://qlab.app/appcast/v5/", sparkle_version_key="shortVersionString", scraper=scrape_sparkle),
     App(name="R", app_url="https://cran.rstudio.com/bin/macosx", scraper=scrape_r),
     App(name="Raspberry Pi Imager", download_url="https://downloads.raspberrypi.org/imager/imager_latest.dmg", scraper=scrape_raspberrypiimager),
-    App(name="RStudio", app_url="https://docs.posit.co/ide/user/#rstudio-ide-oss-downloads", scraper=scrape_rstudio),
+    App(name="RStudio", app_url="https://docs.posit.co/ide/user/download.html", scraper=scrape_rstudio),
     App(name="SAP Privileges", app_url="https://github.com/SAP/macOS-enterprise-privileges", file_search_strings=[".pkg"], scraper=scrape_github),
     App(name="Sassafras KeyAccess Mac", app_url="https://solutions.teamdynamix.com/TDClient/1965/Portal/KB/Article/169236/Current-ITAM-Downloads", scraper=scrape_sassafraskeyaccessmac),
     App(name="ScopeMap", app_url="https://github.com/Jamf-Concepts/scope-map", file_search_strings=[".pkg"], scraper=scrape_github),

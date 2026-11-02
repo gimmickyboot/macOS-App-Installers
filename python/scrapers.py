@@ -678,7 +678,7 @@ def scrape_gpgtools(session: requests.Session, app: App) -> Result:
 
     download_url = get_href_link(soup, ".dmg")
     file_name = filename_from_url(download_url)
-    version = extract_version(file_name)
+    version = extract_version(download_url, pattern=r"GPG_Suite-(\d+)n\.dmg")
     if not version:
         raise ValueError("Could not extract version")
 
