@@ -71,6 +71,22 @@ else
 fi
 
 if /usr/bin/curl --retry 3 --retry-delay 0 --retry-all-errors -sL "${downloadURL}" -o /tmp/"${FILE}"; then
+  SHAResult=$(printf '%s' "${SHAHash} */tmp/${FILE}" | /usr/bin/shasum -a 256 -c 2>/dev/null)
+  case "${SHAResult}" in
+    *OK)
+      printf '%s\n' "SHA hash has successfully verifed."
+      ;;
+
+    *FAILED)
+      printf '%s\n' "SHA hash has failed verification"
+      exit 1
+      ;;
+
+    *)
+      printf '%s\n' "An unknown error has occured."
+      exit 1
+      ;;
+  esac
   /bin/rm -rf "${appInstallPath}"/"${bundleName}.app" >/dev/null 2>&1
   /usr/bin/ditto -xk /tmp/"${FILE}" "${appInstallPath}"/.
   /usr/bin/xattr -r -d com.apple.quarantine "${appInstallPath}"/"${bundleName}.app"
