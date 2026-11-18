@@ -123,6 +123,7 @@ apps = [
     App(name="BetterZip", app_url="https://macitbetter.com/BetterZip6.rss", sparkle_version_key="shortVersionString", scraper=scrape_sparkle),
     App(name="Bicep CLI", app_url="https://github.com/Azure/bicep", file_search_strings=["bicep-osx-arm64"], scraper=scrape_github),
     App(name="Blender", app_url="https://www.blender.org/download/", scraper=scrape_blender),
+    App(name="Blueprint Conversion Utility", app_url="https://github.com/jawheelr/Blueprint-Conversion-Utility", file_search_strings=[".pkg"], scraper=scrape_github),
     App(name="Blueshift", app_url="https://github.com/Jamf-Concepts/blueshift", file_search_strings=[".dmg"], scraper=scrape_github),
     App(name="Brave Browser", app_url="https://updates.bravesoftware.com/sparkle/Brave-Browser/stable/appcast.xml", sparkle_version_key="version", scraper=scrape_sparkle),
     App(name="Catalyst Browse", app_url="https://cs.d-imaging.sony.co.jp/coay5hz6MI/2Aext1Frsi?product=CatalystBrowse&lang=en", download_url="https://di.update.sony.net/NEX/ch4055c566/Catalyst_Browse.dmg", scraper=scrape_catalystbrowse),
