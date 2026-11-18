@@ -176,6 +176,7 @@ apps = [
     App(name="Jamf Sync", app_url="https://github.com/jamf/JamfSync", file_search_strings=[".zip"], scraper=scrape_github),
     App(name="JamfCheck", app_url="https://github.com/txhaflaire/JamfCheck", file_search_strings=[".dmg"], scraper=scrape_github),
     App(name="jamfHelper Constructor", app_url="https://github.com/BIG-RAT/jhc", file_search_strings=[".zip"], scraper=scrape_github),
+    App(name="jamfMigrator", app_url="https://github.com/JordyThery/JamfMigrator", file_search_strings=[".zip"], scraper=scrape_github),
     App(name="Joplin", app_url="https://github.com/laurent22/joplin", file_search_strings=["arm64", ".zip"], scraper=scrape_github),
     App(name="jq", app_url="https://github.com/jqlang/jq", file_search_strings=["macos-arm64"], scraper=scrape_github),
     App(name="Karabena Elements", app_url="https://github.com/pqrs-org/Karabiner-Elements", file_search_strings=["dmg"], scraper=scrape_github),
