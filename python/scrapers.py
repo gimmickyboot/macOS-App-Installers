@@ -257,10 +257,24 @@ def scrape_blender(session: requests.Session, app: App) -> Result:
 
     soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
 
-    download_url = get_href_link(soup, "macos-arm64.dmg").strip('/')
+    versions = []
+    for a_tag in soup.find_all("a", href=True):
+      # Match standard release folders like 'Blender5.3/'
+      match = re.match(r"^Blender(\d+\.\d+)/$", a_tag["href"])
+      if match:
+        versions.append(match.group(1))
 
-    file_name = filename_from_url(download_url)
-    version = extract_version(file_name)
+    # Sort numerically by major and minor version numbers
+    latest_version = max(versions, key=lambda v: [int(x) for x in v.split(".")])
+    latest_url = f"{app.app_url}Blender{latest_version}/"
+
+    soup = BeautifulSoup(get_text(latest_url, session), "html.parser")
+    a_tag = soup.find("a", href=re.compile(r"macos-arm64\.dmg$", re.I))
+    filename = a_tag["href"]
+
+    version = extract_version(filename)
+    download_url = f"{app.app_url}Blender{latest_version}/{filename}"
+
     if not version:
         raise ValueError("Could not determine version")
 
@@ -2148,10 +2162,9 @@ def scrape_nvivo(session: requests.Session, app: App) -> Result:
         raise ValueError("app_url is required")
 
     soup = BeautifulSoup(get_text(app.app_url, session), "html.parser")
-
-    span = soup.find("span", string="NVivo Mac")
-    class_text = span.get("class")
-    version_maj = re.search(r"NVivo_(\d+)_for_Mac", class_text[1]).group(1)
+    a_tag = soup.find("a", string=re.compile(r"^\s*nvivo desktop mac\s*$", re.I))
+    href = a_tag["href"]
+    version_maj = re.search(r"nm(\d+)", href).group(1)
     download_url_tmp = app.download_url_template.format(version_maj=version_maj)
 
     download_url = get_redirect_url(download_url_tmp, session)
